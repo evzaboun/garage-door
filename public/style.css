@@ -1,0 +1,23 @@
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
+body {
+  margin: 40px;
+  background-color: #2d2d2d;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: auto;
+  grid-gap: 10px;
+}
+
+.button {
+  background-color: #444;
+  color: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  font-size: 150%;
+}

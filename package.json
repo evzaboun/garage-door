@@ -1,0 +1,24 @@
+{
+  "name": "garage-door",
+  "version": "1.0.0",
+  "description": "Garage door opener",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evzaboun/garage-door.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/evzaboun/garage-door/issues"
+  },
+  "homepage": "https://github.com/evzaboun/garage-door#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
