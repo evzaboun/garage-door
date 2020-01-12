@@ -38,13 +38,14 @@ client.onmessage = function(e) {
 };
 
 const openButtonPressed = function() {
-  client.send("OPEN BUTTON PRESSED");
-  console.log("OPEN");
+  client.send("OPEN");
+  console.log("OPEN BUTTON PRESSED");
 };
 
 const closeButtonPressed = function() {
-  client.send("CLOSE BUTTON PRESSED");
-  console.log("CLOSE");
+  client.send("CLOSE");
+
+  console.log("CLOSE BUTTON PRESSED");
 };
 
 window.addEventListener("load", event => {
@@ -57,6 +58,18 @@ document
 document
   .getElementById("closeButton")
   .addEventListener("click", closeButtonPressed);
+
+document.addEventListener("visibilitychange", () => {
+  console.log(document.visibilityState);
+  client.send(`Visibility: ${document.visibilityState}`);
+  if (document.visibilityState === "hidden") {
+    client.send("RESET");
+    client.close();
+  } else if (document.visibilityState === "visible") {
+    client.send(`Visibility: ${document.visibilityState}`);
+    document.location.reload(false);
+  }
+});
 
 function heartbeat() {
   clearTimeout(this.pingTimeout);
