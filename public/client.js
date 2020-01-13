@@ -37,12 +37,14 @@ client.onmessage = function(e) {
   //client.close();
 };
 
-const openButtonPressed = function() {
+const openButtonPressed = function(e) {
+  e.stopPropagation();
   client.send("OPEN");
   console.log("OPEN BUTTON PRESSED");
 };
 
-const closeButtonPressed = function() {
+const closeButtonPressed = function(e) {
+  e.stopPropagation();
   client.send("CLOSE");
 
   console.log("CLOSE BUTTON PRESSED");
@@ -50,6 +52,10 @@ const closeButtonPressed = function() {
 
 window.addEventListener("load", event => {
   console.log("page is fully loaded");
+});
+
+document.addEventListener("click", event => {
+  client.send("FREEZE");
 });
 
 document
@@ -63,7 +69,7 @@ document.addEventListener("visibilitychange", () => {
   console.log(document.visibilityState);
   client.send(`Visibility: ${document.visibilityState}`);
   if (document.visibilityState === "hidden") {
-    client.send("RESET");
+    client.send("FREEZE");
     client.close();
   } else if (document.visibilityState === "visible") {
     client.send(`Visibility: ${document.visibilityState}`);
