@@ -40,11 +40,13 @@ client.onmessage = function(e) {
 const openButtonPressed = function(e) {
   e.stopPropagation();
   client.send("OPEN");
+  navigator.vibrate(15);
   console.log("OPEN BUTTON PRESSED");
 };
 
 const closeButtonPressed = function(e) {
   e.stopPropagation();
+  navigator.vibrate(15);
   client.send("CLOSE");
 
   console.log("CLOSE BUTTON PRESSED");
@@ -56,6 +58,7 @@ window.addEventListener("load", event => {
 
 document.addEventListener("click", event => {
   client.send("FREEZE");
+  navigator.vibrate([20, 50, 20]);
 });
 
 document

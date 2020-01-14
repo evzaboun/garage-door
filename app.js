@@ -78,5 +78,4 @@ const interval = setInterval(function ping() {
 process.on("SIGINT", _ => {
   openDoor.unexport();
   closeDoor.unexport();
-  button.unexport();
 });
