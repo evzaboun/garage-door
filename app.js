@@ -29,7 +29,7 @@ wss.on("connection", function connection(peer) {
   peer.on("pong", heartbeat);
   console.log("Client connected!");
   console.log("No of Clients: " + wss.clients.size);
-
+  peer.send("Hello peer!");
   peer.on("message", function incoming(message) {
     console.log("Server received: %s", message);
     if (message === "OPEN") {

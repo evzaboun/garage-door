@@ -1,6 +1,8 @@
 const client = new WebSocket("ws://192.168.1.250:8081");
 
 client.onopen = function(e) {
+  console.log(client.readyState);
+  //toggleButtonState(true);
   client.send("CLIENT: CONNECTED TO WS SERVER");
   console.log("Client onopen fired");
 };
@@ -13,31 +15,39 @@ window.onunload = window.onbeforeunload = function(event) {
 window.onoffline = event => {
   console.log("The network connection has been lost.");
   client.send("CLIENT: OFFLINE ");
+  toggleButtonState(false);
+  console.log(client.readyState);
   client.close();
 };
 
 window.ononline = event => {
   console.log("The network connection has reconnected.");
+  toggleButtonState(true);
+  document.location.reload(false);
   client.send("CLIENT: ONLINE ");
 };
 
 client.onclose = function(e) {
+  toggleButtonState(false);
+  console.log(client.readyState);
   client.close();
   console.log("Disconnected: " + e.reason);
   console.log("Client onclose fired");
 };
 
 client.onerror = function(e) {
-  console.log("onerror fired");
+  console.log(`onerror fired: ${e.reason}`);
 };
 
 client.onmessage = function(e) {
   console.log("Message received: " + e.data);
+  toggleButtonState(true);
   // Close the socket once one message has arrived.
   //client.close();
 };
 
 const openButtonPressed = function(e) {
+  e.preventDefault();
   e.stopPropagation();
   client.send("OPEN");
   navigator.vibrate(15);
@@ -45,11 +55,21 @@ const openButtonPressed = function(e) {
 };
 
 const closeButtonPressed = function(e) {
+  e.preventDefault();
   e.stopPropagation();
   navigator.vibrate(15);
   client.send("CLOSE");
-
   console.log("CLOSE BUTTON PRESSED");
+};
+
+const toggleButtonState = function(enabled) {
+  if (enabled) {
+    document.getElementById("openButton").disabled = false;
+    document.getElementById("closeButton").disabled = false;
+  } else {
+    document.getElementById("openButton").disabled = true;
+    document.getElementById("closeButton").disabled = true;
+  }
 };
 
 window.addEventListener("load", event => {
@@ -93,8 +113,8 @@ function heartbeat() {
   }, 30000 + 1000);
 }
 
-client.on("open", heartbeat);
-client.on("ping", heartbeat);
-client.on("close", function clear() {
-  clearTimeout(this.pingTimeout);
-});
+//client.on("open", heartbeat);
+//client.on("ping", heartbeat);
+// client.on("close", function clear() {
+//   clearTimeout(this.pingTimeout);
+// });

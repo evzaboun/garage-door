@@ -16,8 +16,17 @@ body {
 
 .button {
   background-color: #444;
-  color: #fff;
+  color: white;
   border-radius: 5px;
+  padding: 20px;
+  font-size: 150%;
+}
+
+.button:disabled {
+  background-color: #444;
+  color: gray;
+  border-radius: 5px;
+  border-color: red;
   padding: 20px;
   font-size: 150%;
 }
