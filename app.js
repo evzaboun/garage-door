@@ -3,6 +3,8 @@ const WebSocket = require("ws");
 const Gpio = require("onoff").Gpio;
 const closeDoor = new Gpio(27, "high");
 const openDoor = new Gpio(22, "high");
+const openButton = new Gpio(6, "in", "both", { debounceTimeout: 100 });
+const closeButton = new Gpio(5, "in", "both", { debounceTimeout: 100 });
 
 const wss = new WebSocket.Server({ port: 8081 });
 const app = express();
@@ -21,6 +23,22 @@ app.listen(port, "192.168.1.250", () => {
 app.get("/", (req, res) => {
   console.log("Rooot is resolved");
   res.send("Hello from route!");
+});
+
+openButton.watch((err, value) => {
+  console.log("Open button pressed!, its value was " + value);
+  if (err) {
+    throw err;
+  }
+  openDoor.writeSync(value);
+});
+
+closeButton.watch((err, value) => {
+  console.log("Close button pressed!, its value was " + value);
+  if (err) {
+    throw err;
+  }
+  closeDoor.writeSync(value);
 });
 
 // Websocket server setup
@@ -75,7 +93,9 @@ const interval = setInterval(function ping() {
   });
 }, 1000);
 
-process.on("SIGINT", _ => {
-  openDoor.unexport();
-  closeDoor.unexport();
-});
+// process.on("SIGINT", _ => {
+//   openButton.unexport();
+//   closeButton.unexport();
+//   openDoor.unexport();
+//   closeDoor.unexport();
+// });
