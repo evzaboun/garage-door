@@ -1,8 +1,8 @@
 const express = require("express");
 const WebSocket = require("ws");
 const Gpio = require("onoff").Gpio;
-const closeDoor = new Gpio(27, "high");
-const openDoor = new Gpio(22, "high");
+const relayClose = new Gpio(27, "high");
+const relayOpen = new Gpio(22, "high");
 const openButton = new Gpio(6, "in", "both", { debounceTimeout: 100 });
 const closeButton = new Gpio(5, "in", "both", { debounceTimeout: 100 });
 
@@ -25,20 +25,31 @@ app.get("/", (req, res) => {
   res.send("Hello from route!");
 });
 
+function gpioStatus() {
+  console.log("----------");
+  console.log(`Open button pressed!, its value is ${openButton.readSync()}`);
+  console.log(`Close button pressed!, its value is ${closeButton.readSync()}`);
+  console.log(`Open Relay status, its value is ${relayOpen.readSync()}`);
+  console.log(`Close Relay status, its value is ${relayClose.readSync()}`);
+  console.log("==========");
+}
+
 openButton.watch((err, value) => {
-  console.log("Open button pressed!, its value was " + value);
   if (err) {
     throw err;
   }
-  openDoor.writeSync(value);
+  relayOpen.writeSync(value);
+  console.log(`Open button pressed!, its value is ${relayOpen.readSync()}`);
+  gpioStatus();
 });
 
 closeButton.watch((err, value) => {
-  console.log("Close button pressed!, its value was " + value);
   if (err) {
     throw err;
   }
-  closeDoor.writeSync(value);
+  relayClose.writeSync(value);
+  console.log(`Close button pressed!, its value is ${relayClose.readSync()}`);
+  gpioStatus();
 });
 
 // Websocket server setup
@@ -51,14 +62,17 @@ wss.on("connection", function connection(peer) {
   peer.on("message", function incoming(message) {
     console.log("Server received: %s", message);
     if (message === "OPEN") {
-      closeDoor.writeSync(1);
-      openDoor.writeSync(0);
+      relayClose.writeSync(1);
+      relayOpen.writeSync(0);
+      gpioStatus();
     } else if (message === "CLOSE") {
-      openDoor.writeSync(1);
-      closeDoor.writeSync(0);
+      relayOpen.writeSync(1);
+      relayClose.writeSync(0);
+      gpioStatus();
     } else {
-      openDoor.writeSync(1);
-      closeDoor.writeSync(1);
+      relayOpen.writeSync(1);
+      relayClose.writeSync(1);
+      gpioStatus();
     }
   });
 
