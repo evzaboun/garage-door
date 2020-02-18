@@ -12,11 +12,11 @@ wss.on("connection", function connection(peer) {
   peer.on("message", function incoming(message) {
     console.log("Server received: %s", message);
     if (message === "OPEN") {
-      eventEmitter.emit("open");
+      eventEmitter.emit("open", "open");
     } else if (message === "CLOSE") {
-      eventEmitter.emit("close");
+      eventEmitter.emit("close", "close");
     } else {
-      eventEmitter.emit("freeze");
+      eventEmitter.emit("freeze", "freeze");
     }
   });
 
