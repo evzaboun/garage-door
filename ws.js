@@ -12,11 +12,11 @@ wss.on("connection", function connection(peer) {
   peer.on("message", function incoming(message) {
     console.log("Server received: %s", message);
     if (message === "OPEN") {
-      eventEmitter.emit("open", "UIButton", "open");
+      eventEmitter.emit("open");
     } else if (message === "CLOSE") {
-      eventEmitter.emit("close", "UIButton", "close");
+      eventEmitter.emit("close");
     } else {
-      eventEmitter.emit("freeze", "UIButton", "freeze");
+      eventEmitter.emit("freeze");
     }
   });
 
@@ -42,12 +42,11 @@ function heartbeat() {
   this.isAlive = true;
 }
 
-const interval = setInterval(function ping() {
+setInterval(function ping() {
   wss.clients.forEach(function each(peer) {
     if (peer.isAlive === false) return peer.terminate();
     peer.isAlive = false;
     peer.ping(noop);
-    console.log("pinging...");
   });
 }, 1000);
 
