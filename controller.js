@@ -72,9 +72,9 @@ const direction = event => {
 
 //setInterval(() => console.log(state), 1000);
 
-// process.on("SIGINT", _ => {
-//   openButton.unexport();
-//   closeButton.unexport();
-//   relayOpen.unexport();
-//   relayClose.unexport();
-// });
+process.on("SIGINT", _ => {
+  openButton.unexport();
+  closeButton.unexport();
+  relayOpen.unexport();
+  relayClose.unexport();
+});
