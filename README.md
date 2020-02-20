@@ -21,5 +21,5 @@ PS. Photos coming soon!
 TODO:
 
 - Make the html page a browser installable PWA
-- Add reed switches when door is fully open or closed (to disable relay & get the door state)
 - User auth & HTTPS
+- Add laser beam switches with reflector (stops the door when interrupted, for safety reasons)
