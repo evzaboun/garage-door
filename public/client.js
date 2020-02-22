@@ -88,17 +88,17 @@ document
   .getElementById("closeButton")
   .addEventListener("click", closeButtonPressed);
 
-document.addEventListener("visibilitychange", () => {
-  console.log(document.visibilityState);
-  client.send(`Visibility: ${document.visibilityState}`);
-  if (document.visibilityState === "hidden") {
-    client.send("FREEZE");
-    client.close();
-  } else if (document.visibilityState === "visible") {
-    client.send(`Visibility: ${document.visibilityState}`);
-    document.location.reload(false);
-  }
-});
+// document.addEventListener("visibilitychange", () => {
+//   console.log(document.visibilityState);
+//   client.send(`Visibility: ${document.visibilityState}`);
+//   if (document.visibilityState === "hidden") {
+//     client.send("FREEZE");
+//     client.close();
+//   } else if (document.visibilityState === "visible") {
+//     client.send(`Visibility: ${document.visibilityState}`);
+//     document.location.reload(false);
+//   }
+// });
 
 function heartbeat() {
   clearTimeout(this.pingTimeout);

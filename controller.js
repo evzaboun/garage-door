@@ -20,25 +20,26 @@ eventEmitter.on("open", event => direction(event));
 eventEmitter.on("close", event => direction(event));
 eventEmitter.on("freeze", event => direction(event));
 
-reedSwitchTop.watch((err, value) => {
-  if (err) {
-    throw err;
-  }
-  if (value === 0) {
-    setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
-  }
-  console.log(`Top Reed Switch activated! value: ${value}`);
-});
+// reedSwitchTop.watch((err, value) => {
+//   if (err) {
+//     throw err;
+//   }
+//   if (value === 0) {
+//     setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
+//   }
 
-reedSwitchBottom.watch((err, value) => {
-  if (err) {
-    throw err;
-  }
-  if (value === 0) {
-    setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
-  }
-  console.log(`Bottom Reed Switch activated! value: ${value}`);
-});
+//   console.log(`Top Reed Switch activated! value: ${value}`);
+// });
+
+// reedSwitchBottom.watch((err, value) => {
+//   if (err) {
+//     throw err;
+//   }
+//   if (value === 0) {
+//     setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
+//   }
+//   console.log(`Bottom Reed Switch activated! value: ${value}`);
+// });
 
 openButton.watch((err, value) => {
   if (err) {
@@ -72,12 +73,24 @@ const fixRange = () => {
   state = state > 1 ? 1 : state < -1 ? -1 : state;
 };
 
+let timer = 0;
+
+const setTimer = () => {
+  timer = setTimeout(() => eventEmitter.emit("freeze", "freeze"), 60000);
+};
+
+const clearTimer = () => clearTimeout(timer);
+
 const direction = event => {
+  clearTimer();
+
   if (event === "open") {
     state++;
+    setTimer();
   }
   if (event === "close") {
     state--;
+    setTimer();
   }
   if (event === "freeze") {
     state = 0;
