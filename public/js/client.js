@@ -118,3 +118,36 @@ function heartbeat() {
 // client.on("close", function clear() {
 //   clearTimeout(this.pingTimeout);
 // });
+
+// window.onload = () => {
+//   "use strict";
+
+//   if ("serviceWorker" in navigator) {
+//     navigator.serviceWorker
+//       .register("./sw.js")
+//       .then(reg => {
+//         console.log("Registered the SW!", reg);
+//       })
+//       .catch(err => {
+//         console.log("Registration of the SW failed!", err);
+//       });
+//   } else {
+//     console.log("Service workers are not supported.");
+//   }
+// };
+
+// window.addEventListener("beforeinstallprompt", function(e) {
+//   // beforeinstallprompt Event fired
+
+//   // e.userChoice will return a Promise.
+//   // For more details read: https://developers.google.com/web/fundamentals/getting-started/primers/promises
+//   e.userChoice.then(function(choiceResult) {
+//     console.log(choiceResult.outcome);
+
+//     if (choiceResult.outcome == "dismissed") {
+//       console.log("User cancelled home screen install");
+//     } else {
+//       console.log("User added to home screen");
+//     }
+//   });
+// });
