@@ -25,5 +25,6 @@ PS. Photos coming soon!
 TODO:
 
 - HTTPS (self singed cert & installable PWA)
+- HTTPS (self-signed cert)
 - User auth
 - Add laser beam switches with reflector (stops & reverses the door when interrupted, for safety reasons)
