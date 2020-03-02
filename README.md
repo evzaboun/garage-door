@@ -4,7 +4,7 @@ A garage door remote control system, that can open/close/freeze the door through
 
 Fritzing schematic:
 
-![alt text](http://url/to/wiring.png)
+![alt text](https://raw.githubusercontent.com/evzaboun/garage-door/master/fritzing/wiring.png)
 
 Used the following tools:
 
