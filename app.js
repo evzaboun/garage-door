@@ -1,17 +1,18 @@
 const express = require("express");
+const dotenv = require("dotenv").config();
 const controller = require("./controller");
 const ws = require("./ws");
+const os = require("os");
 const app = express();
 
-//Express app
 app.use(express.static("./public"));
-
 const port = process.env.PORT || 8080;
+const ip = eval(process.env.HOSTNAME) || process.env.IP;
 
 app.set("port", port);
 
-app.listen(port, "192.168.1.250", () => {
-  console.log(`Server is listening on port: ${port}`);
+app.listen(port, ip, () => {
+  console.log(`Server is listening on : ${ip + ":" + port}`);
 });
 
 app.get("/", (req, res) => {

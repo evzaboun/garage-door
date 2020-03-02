@@ -1,7 +1,7 @@
 // Websocket client-server communication setup
 const WebSocket = require("ws");
 const eventEmitter = require("./eventEmitter");
-const wss = new WebSocket.Server({ port: 8081 });
+const wss = new WebSocket.Server({ port: process.env.WS_PORT });
 
 wss.on("connection", function connection(peer) {
   peer.isAlive = true;
