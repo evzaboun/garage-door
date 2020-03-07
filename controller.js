@@ -6,114 +6,123 @@
 
 const Gpio = require("onoff").Gpio;
 const eventEmitter = require("./eventEmitter");
-const openButton = new Gpio(6, "in", "both", { debounceTimeout: 100 });
-const closeButton = new Gpio(5, "in", "both", { debounceTimeout: 100 });
-const reedSwitchTop = new Gpio(23, "in", "falling", { debounceTimeout: 100 });
-const reedSwitchBottom = new Gpio(24, "in", "falling", {
-  debounceTimeout: 100
-});
-const relayClose = new Gpio(27, "high");
-const relayOpen = new Gpio(22, "high");
-let state = 0;
 
-eventEmitter.on("open", event => direction(event));
-eventEmitter.on("close", event => direction(event));
-eventEmitter.on("freeze", event => direction(event));
+class Controller {
+  constructor() {
+    this.openButton = new Gpio(3, "in", "both", { debounceTimeout: 100 });
+    this.closeButton = new Gpio(2, "in", "both", { debounceTimeout: 100 });
+    this.relayClose = new Gpio(8, "high");
+    this.relayOpen = new Gpio(7, "high");
+    // this.reedSwitchTop = new Gpio(23, "in", "falling", {
+    //   debounceTimeout: 100
+    // });
+    // this.reedSwitchBottom = new Gpio(24, "in", "falling", {
+    //   debounceTimeout: 100
+    // });
+    eventEmitter.on("open", event => this.direction(event));
+    eventEmitter.on("close", event => this.direction(event));
+    eventEmitter.on("freeze", event => this.direction(event));
+    this.state = 0;
+    this.timer = 0;
 
-// reedSwitchTop.watch((err, value) => {
-//   if (err) {
-//     throw err;
-//   }
-//   if (value === 0) {
-//     setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
-//   }
+    this.openButton.watch((err, value) => {
+      if (err) {
+        throw err;
+      }
+      if (value === 0) {
+        eventEmitter.emit("open", "open");
+        console.log(`Open push button pressed`);
+      }
 
-//   console.log(`Top Reed Switch activated! value: ${value}`);
-// });
+      if (value === 1) {
+        eventEmitter.emit("freeze", "freeze");
+      }
+    });
 
-// reedSwitchBottom.watch((err, value) => {
-//   if (err) {
-//     throw err;
-//   }
-//   if (value === 0) {
-//     setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
-//   }
-//   console.log(`Bottom Reed Switch activated! value: ${value}`);
-// });
+    this.closeButton.watch((err, value) => {
+      if (err) {
+        throw err;
+      }
+      if (value === 0) {
+        eventEmitter.emit("close", "close");
+        console.log(`Close push button pressed`);
+      }
 
-openButton.watch((err, value) => {
-  if (err) {
-    throw err;
+      if (value === 1) {
+        eventEmitter.emit("freeze", "freeze");
+      }
+    });
+
+    // reedSwitchTop.watch((err, value) => {
+    //   if (err) {
+    //     throw err;
+    //   }
+    //   if (value === 0) {
+    //     setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
+    //   }
+
+    //   console.log(`Top Reed Switch activated! value: ${value}`);
+    // });
+
+    // reedSwitchBottom.watch((err, value) => {
+    //   if (err) {
+    //     throw err;
+    //   }
+    //   if (value === 0) {
+    //     setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
+    //   }
+    //   console.log(`Bottom Reed Switch activated! value: ${value}`);
+    // });
   }
-  if (value === 0) {
-    eventEmitter.emit("open", "open");
-    console.log(`Open push button pressed`);
+
+  direction(event) {
+    this.clearTimer();
+
+    if (event === "open") {
+      this.state++;
+      this.setTimer();
+    }
+    if (event === "close") {
+      this.state--;
+      this.setTimer();
+    }
+    if (event === "freeze") {
+      this.state = 0;
+    }
+    this.fixRange();
+
+    if (this.state === 1) {
+      setTimeout(() => this.relayOpen.writeSync(0), 100);
+      setTimeout(() => this.relayClose.writeSync(1), 100);
+    } else if (this.state === -1) {
+      setTimeout(() => this.relayOpen.writeSync(1), 100);
+      setTimeout(() => this.relayClose.writeSync(0), 100);
+    } else {
+      this.relayOpen.writeSync(1);
+      this.relayClose.writeSync(1);
+    }
   }
 
-  if (value === 1) {
-    eventEmitter.emit("freeze", "freeze");
-  }
-});
-
-closeButton.watch((err, value) => {
-  if (err) {
-    throw err;
-  }
-  if (value === 0) {
-    eventEmitter.emit("close", "close");
-    console.log(`Close push button pressed`);
+  clearTimer() {
+    clearTimeout(this.timer);
   }
 
-  if (value === 1) {
-    eventEmitter.emit("freeze", "freeze");
+  setTimer() {
+    this.timer = setTimeout(() => eventEmitter.emit("freeze", "freeze"), 60000);
   }
-});
 
-const fixRange = () => {
-  state = state > 1 ? 1 : state < -1 ? -1 : state;
-};
-
-let timer = 0;
-
-const setTimer = () => {
-  timer = setTimeout(() => eventEmitter.emit("freeze", "freeze"), 60000);
-};
-
-const clearTimer = () => clearTimeout(timer);
-
-const direction = event => {
-  clearTimer();
-
-  if (event === "open") {
-    state++;
-    setTimer();
+  fixRange() {
+    this.state = this.state > 1 ? 1 : this.state < -1 ? -1 : this.state;
   }
-  if (event === "close") {
-    state--;
-    setTimer();
-  }
-  if (event === "freeze") {
-    state = 0;
-  }
-  fixRange();
 
-  if (state === 1) {
-    setTimeout(() => relayOpen.writeSync(0), 100);
-    setTimeout(() => relayClose.writeSync(1), 100);
-  } else if (state === -1) {
-    setTimeout(() => relayOpen.writeSync(1), 100);
-    setTimeout(() => relayClose.writeSync(0), 100);
-  } else {
-    relayOpen.writeSync(1);
-    relayClose.writeSync(1);
-  }
-};
+  // exit() {
+  //   process.on("SIGINT", _ => {
+  //     this.openButton.unexport();
+  //     this.closeButton.unexport();
+  //     this.relayOpen.unexport();
+  //     this.relayClose.unexport();
+  //   });
+  // }
+}
 
-//setInterval(() => console.log(state), 1000);
-
-process.on("SIGINT", _ => {
-  openButton.unexport();
-  closeButton.unexport();
-  relayOpen.unexport();
-  relayClose.unexport();
-});
+module.exports = Controller;

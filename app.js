@@ -1,9 +1,12 @@
 const express = require("express");
 const dotenv = require("dotenv").config();
-const controller = require("./controller");
+const Controller = require("./controller");
 const ws = require("./ws");
 const os = require("os");
 const app = express();
+
+const door = new Controller();
+//setInterval(() => console.log(door.state), 1000);
 
 app.use(express.static("./public"));
 const port = process.env.PORT || 8080;
