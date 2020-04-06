@@ -1,6 +1,10 @@
-const garageDoorConnection = {};
+const garageDoorConnection = { instance: null };
 
 garageDoorConnection.connect = function() {
+  if (this.instance) {
+    return;
+  }
+
   this.instance = new WebSocket("ws://192.168.1.250:8081");
 
   //event listeners
@@ -19,7 +23,8 @@ garageDoorConnection.connect = function() {
 };
 
 garageDoorConnection.disconnect = function() {
-  this.instance.terminate();
+  this.instance.close();
+  this.instance = null;
 };
 
 garageDoorConnection.send = function(message) {

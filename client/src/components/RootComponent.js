@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import clsx from "clsx";
+import { Router, Route, Link } from "react-router-dom";
+import { createBrowserHistory } from "history";
 import { withStyles, withTheme } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
@@ -24,8 +26,10 @@ import OfflineBoltIcon from "@material-ui/icons/OfflineBolt";
 import LoginButton from "@material-ui/core/Button";
 import OpacityIcon from "@material-ui/icons/Opacity";
 import GarageDoor from "./GarageDoor";
+import SolarTemperature from "./SolarTemperature";
 
 const drawerWidth = 240;
+const history = createBrowserHistory();
 
 const styles = theme => ({
   root: {
@@ -121,8 +125,8 @@ class RootComponent extends Component {
     this.setState({ open: false });
   };
 
-  handleDrawerItemClick = () => {
-    //this.setState({title:})
+  onItemClick = title => {
+    this.setState({ title: title });
   };
 
   render() {
@@ -161,65 +165,123 @@ class RootComponent extends Component {
             </LoginButton>
           </Toolbar>
         </AppBar>
-        <Drawer
-          variant="permanent"
-          className={clsx(classes.drawer, {
-            [classes.drawerOpen]: this.state.open,
-            [classes.drawerClose]: !this.state.open
-          })}
-          classes={{
-            paper: clsx({
+        <Router history={history}>
+          <Drawer
+            variant="permanent"
+            className={clsx(classes.drawer, {
               [classes.drawerOpen]: this.state.open,
               [classes.drawerClose]: !this.state.open
-            })
-          }}
-        >
-          <div className={classes.toolbar}>
-            <IconButton onClick={this.handleDrawerClose}>
-              {theme.direction === "rtl" ? (
-                <ChevronRightIcon />
-              ) : (
-                <ChevronLeftIcon />
-              )}
-            </IconButton>
-          </div>
-          <Divider />
-          <List>
-            <ListItem button divider={true} key={"Garage remote"}>
-              <ListItemIcon>{<RemoteControlIcon />}</ListItemIcon>
-              <ListItemText primary={"Garage remote"} />
-            </ListItem>
-            <ListItem button divider={true} key={"Solar tube temp monitor"}>
-              <ListItemIcon>{<EcoIcon />}</ListItemIcon>
-              <ListItemText primary={"Solar temperatures"} />
-            </ListItem>
-            <ListItem button divider={true} disabled={true} key={"Hot water"}>
-              <ListItemIcon>{<HotTubIcon />}</ListItemIcon>
-              <ListItemText primary={"Hot water"} />
-            </ListItem>
-            <ListItem button divider={true} disabled={true} key={"Energy"}>
-              <ListItemIcon>{<OfflineBoltIcon />}</ListItemIcon>
-              <ListItemText primary={"Energy usage"} />
-            </ListItem>
-            <ListItem button divider={true} disabled={true} key={"Irrigation"}>
-              <ListItemIcon>{<OpacityIcon />}</ListItemIcon>
-              <ListItemText primary={"Irrigation"} />
-            </ListItem>
-            <ListItem button divider={true} disabled={true} key={"Security"}>
-              <ListItemIcon>{<LockOpenIcon />}</ListItemIcon>
-              <ListItemText primary={"Security"} />
-            </ListItem>
-            <ListItem button divider={true} key={"Settings"}>
-              <ListItemIcon>{<SettingsIcon />}</ListItemIcon>
-              <ListItemText primary={"Settings"} />
-            </ListItem>
-          </List>
-          <Divider />
-        </Drawer>
-        <main className={classes.content}>
-          <div className={classes.toolbar} />
-          <GarageDoor />
-        </main>
+            })}
+            classes={{
+              paper: clsx({
+                [classes.drawerOpen]: this.state.open,
+                [classes.drawerClose]: !this.state.open
+              })
+            }}
+          >
+            <div className={classes.toolbar}>
+              <IconButton onClick={this.handleDrawerClose}>
+                {theme.direction === "rtl" ? (
+                  <ChevronRightIcon />
+                ) : (
+                  <ChevronLeftIcon />
+                )}
+              </IconButton>
+            </div>
+            <Divider />
+            <List>
+              <ListItem
+                button
+                component={Link}
+                to="/"
+                onClick={() => this.onItemClick("Garage remote")}
+                divider={true}
+                key={"Garage remote"}
+              >
+                <ListItemIcon>{<RemoteControlIcon />}</ListItemIcon>
+                <ListItemText primary={"Garage remote"} />
+              </ListItem>
+              <ListItem
+                button
+                component={Link}
+                to="/solar"
+                onClick={() => this.onItemClick("Solar temperatures")}
+                divider={true}
+                key={"Solar temperatures"}
+              >
+                <ListItemIcon>{<EcoIcon />}</ListItemIcon>
+                <ListItemText primary={"Solar temperatures"} />
+              </ListItem>
+              <ListItem
+                button
+                component={Link}
+                to="/hotWater"
+                onClick={() => this.onItemClick("Hot Water")}
+                divider={true}
+                disabled={true}
+                key={"Hot water"}
+              >
+                <ListItemIcon>{<HotTubIcon />}</ListItemIcon>
+                <ListItemText primary={"Hot water"} />
+              </ListItem>
+              <ListItem
+                button
+                component={Link}
+                to="/energy"
+                onClick={() => this.onItemClick("Energy")}
+                divider={true}
+                disabled={true}
+                key={"Energy"}
+              >
+                <ListItemIcon>{<OfflineBoltIcon />}</ListItemIcon>
+                <ListItemText primary={"Energy usage"} />
+              </ListItem>
+              <ListItem
+                button
+                component={Link}
+                to="/irrigation"
+                onClick={() => this.onItemClick("Irrigation")}
+                divider={true}
+                disabled={true}
+                key={"Irrigation"}
+              >
+                <ListItemIcon>{<OpacityIcon />}</ListItemIcon>
+                <ListItemText primary={"Irrigation"} />
+              </ListItem>
+              <ListItem
+                button
+                component={Link}
+                to="/security"
+                onClick={() => this.onItemClick("Security")}
+                divider={true}
+                disabled={true}
+                key={"Security"}
+              >
+                <ListItemIcon>{<LockOpenIcon />}</ListItemIcon>
+                <ListItemText primary={"Security"} />
+              </ListItem>
+              <ListItem
+                button
+                component={Link}
+                to="/settings"
+                onClick={() => this.onItemClick("Settings")}
+                divider={true}
+                disabled={false}
+                key={"Settings"}
+              >
+                <ListItemIcon>{<SettingsIcon />}</ListItemIcon>
+                <ListItemText primary={"Settings"} />
+              </ListItem>
+            </List>
+            <Divider />
+          </Drawer>
+          <main className={classes.content}>
+            <div className={classes.toolbar} />
+            <Route exact path="/" component={GarageDoor} />
+            <Route path="/solar" component={SolarTemperature} />
+            {/* <GarageDoor /> */}
+          </main>
+        </Router>
       </div>
     );
   }

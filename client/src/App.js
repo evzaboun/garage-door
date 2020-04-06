@@ -7,5 +7,4 @@ class App extends Component {
     return <RootComponent />;
   }
 }
-
 export default App;
