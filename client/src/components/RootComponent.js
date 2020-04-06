@@ -21,6 +21,9 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import HotTubIcon from "@material-ui/icons/HotTub";
 import LockOpenIcon from "@material-ui/icons/LockOpen";
 import OfflineBoltIcon from "@material-ui/icons/OfflineBolt";
+import LoginButton from "@material-ui/core/Button";
+import OpacityIcon from "@material-ui/icons/Opacity";
+import GarageDoor from "./GarageDoor";
 
 const drawerWidth = 240;
 
@@ -28,12 +31,14 @@ const styles = theme => ({
   root: {
     display: "flex"
   },
+
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
-    })
+    }),
+    backgroundColor: "#212121"
   },
   appBarShift: {
     marginLeft: drawerWidth,
@@ -72,6 +77,18 @@ const styles = theme => ({
       width: theme.spacing(9) + 1
     }
   },
+
+  title: {
+    flexGrow: 1,
+    textAlign: "center",
+    fontWeight: "bold"
+  },
+
+  loginButton: {
+    fontWeight: "bold",
+    color: "#e0e0e0"
+  },
+
   toolbar: {
     display: "flex",
     alignItems: "center",
@@ -81,8 +98,8 @@ const styles = theme => ({
     ...theme.mixins.toolbar
   },
   content: {
-    flexGrow: 1,
-    padding: theme.spacing(3)
+    flexGrow: 1
+    // padding: theme.spacing(3)
   }
 });
 
@@ -90,7 +107,9 @@ class RootComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      open: false
+      title: "Home monitoring",
+      open: false,
+      auth: true
     };
   }
 
@@ -102,8 +121,13 @@ class RootComponent extends Component {
     this.setState({ open: false });
   };
 
+  handleDrawerItemClick = () => {
+    //this.setState({title:})
+  };
+
   render() {
     const { classes, theme } = this.props;
+
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -125,9 +149,16 @@ class RootComponent extends Component {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap>
-              Home Monitoring
+            <Typography variant="h6" noWrap className={classes.title}>
+              {this.state.title}
             </Typography>
+            <LoginButton
+              color="inherit"
+              variant="outlined"
+              className={classes.loginButton}
+            >
+              {this.state.auth ? "Login" : "Logout"}
+            </LoginButton>
           </Toolbar>
         </AppBar>
         <Drawer
@@ -170,6 +201,10 @@ class RootComponent extends Component {
               <ListItemIcon>{<OfflineBoltIcon />}</ListItemIcon>
               <ListItemText primary={"Energy usage"} />
             </ListItem>
+            <ListItem button divider={true} disabled={true} key={"Irrigation"}>
+              <ListItemIcon>{<OpacityIcon />}</ListItemIcon>
+              <ListItemText primary={"Irrigation"} />
+            </ListItem>
             <ListItem button divider={true} disabled={true} key={"Security"}>
               <ListItemIcon>{<LockOpenIcon />}</ListItemIcon>
               <ListItemText primary={"Security"} />
@@ -183,27 +218,7 @@ class RootComponent extends Component {
         </Drawer>
         <main className={classes.content}>
           <div className={classes.toolbar} />
-          <Typography paragraph>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Rhoncus
-            dolor purus non enim praesent elementum facilisis leo vel. Risus at
-            ultrices mi tempus imperdiet. Semper risus in hendrerit gravida
-            rutrum quisque non tellus. Convallis convallis tellus id interdum
-            velit laoreet id donec ultrices. Cras tincidunt lobortis feugiat
-            vivamus at augue. At augue eget arcu dictum varius duis at
-            consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem
-            donec massa sapien faucibus et molestie ac.
-          </Typography>
-          <Typography paragraph>
-            Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-            ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-            elementum integer enim neque volutpat ac tincidunt. Ornare
-            suspendisse sed nisi lacus sed viverra tellus. Purus sit amet
-            volutpat consequat mauris. Elementum eu facilisis sed odio morbi.
-            Euismod lacinia at quis risus sed vulputate odio. Morbi tincidunt
-            ornare massa eget egestas purus viverra accumsan in. In hendrerit
-            gravida rutrum quisque non tellus orci ac.
-          </Typography>
+          <GarageDoor />
         </main>
       </div>
     );
