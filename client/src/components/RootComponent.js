@@ -27,6 +27,7 @@ import LoginButton from "@material-ui/core/Button";
 import OpacityIcon from "@material-ui/icons/Opacity";
 import GarageDoor from "./GarageDoor";
 import SolarTemperature from "./SolarTemperature";
+import Settings from "./Settings";
 
 const drawerWidth = 240;
 const history = createBrowserHistory();
@@ -102,8 +103,10 @@ const styles = theme => ({
     ...theme.mixins.toolbar
   },
   content: {
-    flexGrow: 1
-    // padding: theme.spacing(3)
+    flexGrow: 1,
+    minHeight: "100vh",
+    position: "relative"
+    //padding: theme.spacing(3)
   }
 });
 
@@ -279,7 +282,7 @@ class RootComponent extends Component {
             <div className={classes.toolbar} />
             <Route exact path="/" component={GarageDoor} />
             <Route path="/solar" component={SolarTemperature} />
-            {/* <GarageDoor /> */}
+            <Route path="/settings" component={Settings} />
           </main>
         </Router>
       </div>

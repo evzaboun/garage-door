@@ -2,17 +2,22 @@ import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import garageDoor from "../services/garageDoorConnection";
+import events from "../services/events";
 
 const styles = {
   freezeContainer: {
-    minHeight: "100vh",
+    height: "100%",
+    width: "100%",
+    position: "absolute",
+    bottom: "0px",
     padding: "10%"
   },
 
   buttonContainer: {
     display: "grid",
     gridTemplateColumns: "auto",
-    gridGap: "3vh"
+    gridGap: "3vh",
+    marginTop: "10vmax"
   },
 
   button: {
@@ -20,7 +25,7 @@ const styles = {
     color: "#212121",
     borderColor: "#212121",
     borderRadius: "5px",
-    padding: "20px",
+    padding: "15px 5% 15px 5%",
     fontWeight: "bold",
     fontSize: "150%"
   }
@@ -29,19 +34,23 @@ const styles = {
 class GarageDoor extends Component {
   constructor(props) {
     super(props);
+    events.on("disconnected", () => {
+      this.setState({ isDisconnected: true });
+    });
+    events.on("connected", () => {
+      this.setState({ isDisconnected: false });
+    });
     this.state = {
-      connected: false
+      isDisconnected: true
     };
   }
 
   componentDidMount() {
     garageDoor.connect();
-    document.body.style.overflow = "hidden";
   }
 
   componentWillUnmount() {
     garageDoor.disconnect();
-    document.body.style.overflow = "initial";
   }
 
   openDoor = e => {
@@ -82,7 +91,7 @@ class GarageDoor extends Component {
           <Button
             variant="outlined"
             className={classes.button}
-            disabled={this.state.connected}
+            disabled={this.state.isDisconnected}
             onClick={e => this.openDoor(e)}
           >
             OPEN
@@ -90,7 +99,7 @@ class GarageDoor extends Component {
           <Button
             variant="outlined"
             className={classes.button}
-            disabled={this.state.connected}
+            disabled={this.state.isDisconnected}
             onClick={e => this.closeDoor(e)}
           >
             CLOSE

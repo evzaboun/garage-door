@@ -1,3 +1,5 @@
+import events from "./events";
+
 const garageDoorConnection = { instance: null };
 
 garageDoorConnection.connect = function() {
@@ -10,10 +12,16 @@ garageDoorConnection.connect = function() {
   //event listeners
   this.instance.onopen = () => {
     console.log("connected websocket");
+    events.emit("connected");
   };
 
   this.instance.onclose = e => {
-    console.log(`Socket is closed for ${e.reason}.`);
+    console.log(`Socket is closed: ${e.reason}`);
+    events.emit("disconnected");
+  };
+
+  this.instance.onmessage = e => {
+    console.log(`Message from server: ${e.data}`);
   };
 
   this.instance.onerror = err => {
