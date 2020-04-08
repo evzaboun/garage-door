@@ -25,7 +25,7 @@ const styles = {
     color: "#212121",
     borderColor: "#212121",
     borderRadius: "5px",
-    padding: "15px 5% 15px 5%",
+    padding: "20px",
     fontWeight: "bold",
     fontSize: "150%"
   }
@@ -34,19 +34,19 @@ const styles = {
 class GarageDoor extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isDisconnected: false
+    };
+  }
+
+  componentDidMount() {
+    garageDoor.connect();
     events.on("disconnected", () => {
       this.setState({ isDisconnected: true });
     });
     events.on("connected", () => {
       this.setState({ isDisconnected: false });
     });
-    this.state = {
-      isDisconnected: true
-    };
-  }
-
-  componentDidMount() {
-    garageDoor.connect();
   }
 
   componentWillUnmount() {
