@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import clsx from "clsx";
-import { Router, Route, Link } from "react-router-dom";
-import { createBrowserHistory } from "history";
+import { Route, Link, Switch } from "react-router-dom";
 import { withStyles, withTheme } from "@material-ui/core/styles";
 import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
@@ -28,70 +27,75 @@ import OpacityIcon from "@material-ui/icons/Opacity";
 import GarageDoor from "./GarageDoor";
 import SolarTemperature from "./SolarTemperature";
 import Settings from "./Settings";
+import SignUp from "./SignUp";
+import SignIn from "./SignIn";
+import ForgotPassword from "./ForgotPassword";
+import auth from "../services/authentication";
+import PrivateRoute from "./PrivateRoute";
+import events from "../services/events";
 
 const drawerWidth = 240;
-const history = createBrowserHistory();
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
-    display: "flex"
+    display: "flex",
   },
 
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
+      duration: theme.transitions.duration.leavingScreen,
     }),
-    backgroundColor: "#212121"
+    backgroundColor: "#212121",
   },
   appBarShift: {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   menuButton: {
-    marginRight: 36
+    marginRight: 36,
   },
   hide: {
-    display: "none"
+    display: "none",
   },
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
-    whiteSpace: "nowrap"
+    whiteSpace: "nowrap",
   },
   drawerOpen: {
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
   drawerClose: {
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
+      duration: theme.transitions.duration.leavingScreen,
     }),
     overflowX: "hidden",
     width: theme.spacing(7) + 1,
     [theme.breakpoints.up("sm")]: {
-      width: theme.spacing(9) + 1
-    }
+      width: theme.spacing(9) + 1,
+    },
   },
 
   title: {
     flexGrow: 1,
     textAlign: "center",
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
 
   loginButton: {
     fontWeight: "bold",
-    color: "#e0e0e0"
+    color: "#e0e0e0",
   },
 
   toolbar: {
@@ -100,14 +104,14 @@ const styles = theme => ({
     justifyContent: "flex-end",
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
-    ...theme.mixins.toolbar
+    ...theme.mixins.toolbar,
   },
   content: {
     flexGrow: 1,
     minHeight: "100vh",
-    position: "relative"
+    position: "relative",
     //padding: theme.spacing(3)
-  }
+  },
 });
 
 class RootComponent extends Component {
@@ -115,8 +119,9 @@ class RootComponent extends Component {
     super(props);
     this.state = {
       title: "Home monitoring",
+      selected: 0,
       open: false,
-      auth: true
+      auth: auth.isAuthenticated,
     };
   }
 
@@ -128,8 +133,35 @@ class RootComponent extends Component {
     this.setState({ open: false });
   };
 
-  onItemClick = title => {
-    this.setState({ title: title });
+  onItemClick = (title, selectedIndex) => {
+    this.setState({ title: title, selected: selectedIndex });
+  };
+
+  componentDidMount() {
+    events.on("signin", () => {
+      this.setState({ auth: auth.isAuthenticated });
+    });
+  }
+
+  //TODO MOVE THE  SIGN IN/OUT METHODS TO THE AUTH SERVICE
+  // signIn = () => {
+  //   auth
+  //     .signIn()
+  //     .then(() => {
+  //       console.log(auth.isAuthenticated);
+  //       this.setState({ auth: auth.isAuthenticated });
+  //     })
+  //     .catch();
+  // };
+
+  signOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        console.log(auth.isAuthenticated);
+        this.setState({ auth: auth.isAuthenticated });
+      })
+      .catch();
   };
 
   render() {
@@ -141,7 +173,7 @@ class RootComponent extends Component {
         <AppBar
           position="fixed"
           className={clsx(classes.appBar, {
-            [classes.appBarShift]: this.state.open
+            [classes.appBarShift]: this.state.open,
           })}
         >
           <Toolbar>
@@ -151,7 +183,7 @@ class RootComponent extends Component {
               onClick={this.handleDrawerOpen}
               edge="start"
               className={clsx(classes.menuButton, {
-                [classes.hide]: this.state.open
+                [classes.hide]: this.state.open,
               })}
             >
               <MenuIcon />
@@ -163,128 +195,146 @@ class RootComponent extends Component {
               color="inherit"
               variant="outlined"
               className={classes.loginButton}
+              onClick={() => {
+                if (auth.isAuthenticated) {
+                  this.signOut();
+                }
+              }}
+              component={Link}
+              to={auth.isAuthenticated ? "/" : "/signin"}
             >
-              {this.state.auth ? "Login" : "Logout"}
+              {auth.isAuthenticated ? "Logout" : "Login"}
             </LoginButton>
           </Toolbar>
         </AppBar>
-        <Router history={history}>
-          <Drawer
-            variant="permanent"
-            className={clsx(classes.drawer, {
+        <Drawer
+          variant="permanent"
+          className={clsx(classes.drawer, {
+            [classes.drawerOpen]: this.state.open,
+            [classes.drawerClose]: !this.state.open,
+          })}
+          classes={{
+            paper: clsx({
               [classes.drawerOpen]: this.state.open,
-              [classes.drawerClose]: !this.state.open
-            })}
-            classes={{
-              paper: clsx({
-                [classes.drawerOpen]: this.state.open,
-                [classes.drawerClose]: !this.state.open
-              })
-            }}
-          >
-            <div className={classes.toolbar}>
-              <IconButton onClick={this.handleDrawerClose}>
-                {theme.direction === "rtl" ? (
-                  <ChevronRightIcon />
-                ) : (
-                  <ChevronLeftIcon />
-                )}
-              </IconButton>
-            </div>
-            <Divider />
-            <List>
-              <ListItem
-                button
-                component={Link}
-                to="/"
-                onClick={() => this.onItemClick("Garage remote")}
-                divider={true}
-                key={"Garage remote"}
-              >
-                <ListItemIcon>{<RemoteControlIcon />}</ListItemIcon>
-                <ListItemText primary={"Garage remote"} />
-              </ListItem>
-              <ListItem
-                button
-                component={Link}
-                to="/solar"
-                onClick={() => this.onItemClick("Solar temperatures")}
-                divider={true}
-                key={"Solar temperatures"}
-              >
-                <ListItemIcon>{<EcoIcon />}</ListItemIcon>
-                <ListItemText primary={"Solar temperatures"} />
-              </ListItem>
-              <ListItem
-                button
-                component={Link}
-                to="/hotWater"
-                onClick={() => this.onItemClick("Hot Water")}
-                divider={true}
-                disabled={true}
-                key={"Hot water"}
-              >
-                <ListItemIcon>{<HotTubIcon />}</ListItemIcon>
-                <ListItemText primary={"Hot water"} />
-              </ListItem>
-              <ListItem
-                button
-                component={Link}
-                to="/energy"
-                onClick={() => this.onItemClick("Energy")}
-                divider={true}
-                disabled={true}
-                key={"Energy"}
-              >
-                <ListItemIcon>{<OfflineBoltIcon />}</ListItemIcon>
-                <ListItemText primary={"Energy usage"} />
-              </ListItem>
-              <ListItem
-                button
-                component={Link}
-                to="/irrigation"
-                onClick={() => this.onItemClick("Irrigation")}
-                divider={true}
-                disabled={true}
-                key={"Irrigation"}
-              >
-                <ListItemIcon>{<OpacityIcon />}</ListItemIcon>
-                <ListItemText primary={"Irrigation"} />
-              </ListItem>
-              <ListItem
-                button
-                component={Link}
-                to="/security"
-                onClick={() => this.onItemClick("Security")}
-                divider={true}
-                disabled={true}
-                key={"Security"}
-              >
-                <ListItemIcon>{<LockOpenIcon />}</ListItemIcon>
-                <ListItemText primary={"Security"} />
-              </ListItem>
-              <ListItem
-                button
-                component={Link}
-                to="/settings"
-                onClick={() => this.onItemClick("Settings")}
-                divider={true}
-                disabled={false}
-                key={"Settings"}
-              >
-                <ListItemIcon>{<SettingsIcon />}</ListItemIcon>
-                <ListItemText primary={"Settings"} />
-              </ListItem>
-            </List>
-            <Divider />
-          </Drawer>
-          <main className={classes.content}>
-            <div className={classes.toolbar} />
-            <Route exact path="/" component={GarageDoor} />
+              [classes.drawerClose]: !this.state.open,
+            }),
+          }}
+        >
+          <div className={classes.toolbar}>
+            <IconButton onClick={this.handleDrawerClose}>
+              {theme.direction === "rtl" ? (
+                <ChevronRightIcon />
+              ) : (
+                <ChevronLeftIcon />
+              )}
+            </IconButton>
+          </div>
+          <Divider />
+          <List>
+            <ListItem
+              button
+              component={Link}
+              to="/garage"
+              selected={this.state.selected === 0}
+              onClick={() => this.onItemClick("Garage remote", 0)}
+              divider={true}
+              key={"Garage remote"}
+            >
+              <ListItemIcon>{<RemoteControlIcon />}</ListItemIcon>
+              <ListItemText primary={"Garage remote"} />
+            </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to="/solar"
+              selected={this.state.selected === 1}
+              onClick={() => this.onItemClick("Solar temperatures", 1)}
+              divider={true}
+              key={"Solar temperatures"}
+            >
+              <ListItemIcon>{<EcoIcon />}</ListItemIcon>
+              <ListItemText primary={"Solar temperatures"} />
+            </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to="/hotWater"
+              selected={this.state.selected === 2}
+              onClick={() => this.onItemClick("Hot Water", 2)}
+              divider={true}
+              disabled={true}
+              key={"Hot water"}
+            >
+              <ListItemIcon>{<HotTubIcon />}</ListItemIcon>
+              <ListItemText primary={"Hot water"} />
+            </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to="/energy"
+              selected={this.state.selected === 3}
+              onClick={() => this.onItemClick("Energy", 3)}
+              divider={true}
+              disabled={true}
+              key={"Energy"}
+            >
+              <ListItemIcon>{<OfflineBoltIcon />}</ListItemIcon>
+              <ListItemText primary={"Energy usage"} />
+            </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to="/irrigation"
+              selected={this.state.selected === 4}
+              onClick={() => this.onItemClick("Irrigation", 4)}
+              divider={true}
+              disabled={true}
+              key={"Irrigation"}
+            >
+              <ListItemIcon>{<OpacityIcon />}</ListItemIcon>
+              <ListItemText primary={"Irrigation"} />
+            </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to="/security"
+              selected={this.state.selected === 5}
+              onClick={() => this.onItemClick("Security", 5)}
+              divider={true}
+              disabled={true}
+              key={"Security"}
+            >
+              <ListItemIcon>{<LockOpenIcon />}</ListItemIcon>
+              <ListItemText primary={"Security"} />
+            </ListItem>
+            <ListItem
+              button
+              component={Link}
+              to="/settings"
+              selected={this.state.selected === 6}
+              onClick={() => this.onItemClick("Settings", 6)}
+              divider={true}
+              disabled={false}
+              key={"Settings"}
+            >
+              <ListItemIcon>{<SettingsIcon />}</ListItemIcon>
+              <ListItemText primary={"Settings"} />
+            </ListItem>
+          </List>
+          <Divider />
+        </Drawer>
+        <main className={classes.content}>
+          <div className={classes.toolbar} />
+          <Switch>
+            <PrivateRoute exact path="/" component={GarageDoor} />
+            <PrivateRoute path="/garage" component={GarageDoor} />
             <Route path="/solar" component={SolarTemperature} />
             <Route path="/settings" component={Settings} />
-          </main>
-        </Router>
+            <Route path="/signup" component={SignUp} />
+            <Route path="/signin" component={SignIn} />
+            <Route path="/forgot" component={ForgotPassword} />
+          </Switch>
+        </main>
       </div>
     );
   }
