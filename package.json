@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/evzaboun/garage-door#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
   }
 }

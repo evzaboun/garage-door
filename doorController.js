@@ -7,7 +7,7 @@
 const Gpio = require("onoff").Gpio;
 const eventEmitter = require("./eventEmitter");
 
-class Controller {
+class DoorController {
   constructor() {
     this.openButton = new Gpio(3, "in", "both", { debounceTimeout: 100 });
     this.closeButton = new Gpio(2, "in", "both", { debounceTimeout: 100 });
@@ -19,9 +19,9 @@ class Controller {
     // this.reedSwitchBottom = new Gpio(24, "in", "falling", {
     //   debounceTimeout: 100
     // });
-    eventEmitter.on("open", event => this.direction(event));
-    eventEmitter.on("close", event => this.direction(event));
-    eventEmitter.on("freeze", event => this.direction(event));
+    eventEmitter.on("open", (event) => this.direction(event));
+    eventEmitter.on("close", (event) => this.direction(event));
+    eventEmitter.on("freeze", (event) => this.direction(event));
     this.state = 0;
     this.timer = 0;
 
@@ -76,6 +76,9 @@ class Controller {
   }
 
   direction(event) {
+    if (!event) {
+      return;
+    }
     this.clearTimer();
 
     if (event === "open") {
@@ -108,7 +111,9 @@ class Controller {
   }
 
   setTimer() {
-    this.timer = setTimeout(() => eventEmitter.emit("freeze", "freeze"), 60000);
+    this.timer = setTimeout(() => {
+      eventEmitter.emit("freeze", "freeze");
+    }, 60000);
   }
 
   fixRange() {
@@ -125,4 +130,4 @@ class Controller {
   // }
 }
 
-module.exports = Controller;
+module.exports = DoorController;

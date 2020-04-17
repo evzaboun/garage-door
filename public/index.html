@@ -22,10 +22,13 @@
     <link rel="stylesheet" href="css/style.css" />
     <meta name="robots" content="noindex" />
   </head>
+  <script src="/socket.io/socket.io.js"></script>
   <body>
-    <div class="container">
-      <button class="button" id="openButton">Open</button>
-      <button class="button" id="closeButton">Close</button>
+    <div class="freezeContainer" id="freezeButton">
+      <div class="buttonContainer">
+        <button class="button" id="openButton">Open</button>
+        <button class="button" id="closeButton">Close</button>
+      </div>
     </div>
     <button style="visibility: hidden;" id="installButton">Install</button>
   </body>
