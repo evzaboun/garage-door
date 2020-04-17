@@ -2,41 +2,62 @@ const express = require("express");
 const app = express();
 const emitter = require("./eventEmitter");
 const http = require("http");
+const https = require("https");
 const dotenv = require("dotenv").config();
+const fs = require("fs");
 const os = require("os");
+const Socket = require("socket.io");
 const DoorController = require("./doorController");
 
 const door = new DoorController();
+
+const io = new Socket();
 //setInterval(() => console.log(door.state), 1000);
 
 app.use(express.static("./public"));
+
+const port = process.env.PORT || 8080;
+const ip = eval(process.env.HOSTNAME) || process.env.IP;
+
+const httpServer = http.createServer(app).listen(8080, () => {
+  console.log(`Server is listening on : ${ip + ":" + 8080}`);
+});
+
+const httpsServer = https
+  .createServer(
+    {
+      key: fs.readFileSync("./ssl/garage.key"),
+      cert: fs.readFileSync("./ssl/garage.crt"),
+      ca: fs.readFileSync("./ssl/myCA.pem"),
+      requestCert: false,
+      rejectUnauthorized: false,
+    },
+    app
+  )
+  .listen(8443, () => {
+    console.log(`Server is listening on : ${ip + ":" + 8433}`);
+  });
 
 app.get("/", (req, res) => {
   console.log("Root is resolved");
   res.send("Hello from route!");
 });
 
-const port = process.env.PORT || 8080;
-const ip = eval(process.env.HOSTNAME) || process.env.IP;
+io.on("connection", (socket) => {
+  console.log(
+    `Client connected. No # of clients: ${countClients(io.sockets.sockets)}`
+  );
 
-const server = http.createServer(app);
-
-const io = require("socket.io")(server, {
-  pingInterval: 500,
-  pingTimeout: 3000,
-});
-
-io.on("connection", function (socket) {
-  console.log(`Client connected. No # of clients: ${io.engine.clientsCount}`);
-
-  socket.on("greet", function (data) {
+  socket.on("greet", (data) => {
     console.log(data);
     socket.emit("respond", { response: "Hello client!" });
   });
 
-  socket.on("disconnect", function () {
+  socket.on("disconnect", () => {
     console.log(
-      `Client disconnected. No # of clients: ${io.engine.clientsCount}`
+      `Client disconnected. No # of clients: ${countClients(
+        io.sockets.sockets
+      )}`
     );
   });
 
@@ -55,14 +76,14 @@ io.on("connection", function (socket) {
     }
   });
 
-  socket.conn.on("packet", function (packet) {
+  socket.conn.on("packet", (packet) => {
     if (packet.type === "ping") {
       //console.log("received ping");
       clearTimeout(timer);
     }
   });
 
-  socket.conn.on("packetCreate", function (packet) {
+  socket.conn.on("packetCreate", (packet) => {
     if (packet.type === "pong") {
       //console.log("sending pong");
       setTimer();
@@ -70,9 +91,17 @@ io.on("connection", function (socket) {
   });
 });
 
-server.listen(port, function () {
-  console.log(`Server is listening on : ${ip + ":" + port}`);
-});
+const countClients = (clients) => {
+  return Object.keys(clients).length;
+};
+
+const options = {
+  pingInterval: 500,
+  pingTimeout: 3000,
+};
+
+io.attach(httpServer, options);
+io.attach(httpsServer, options);
 
 let timer = null;
 const setTimer = () => {
