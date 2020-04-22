@@ -32,7 +32,7 @@ import SignIn from "./SignIn";
 import ForgotPassword from "./ForgotPassword";
 import auth from "../services/authentication";
 import PrivateRoute from "./PrivateRoute";
-import events from "../services/events";
+import emitter from "../services/emitter";
 
 const drawerWidth = 240;
 
@@ -138,7 +138,7 @@ class RootComponent extends Component {
   };
 
   componentDidMount() {
-    events.on("signin", () => {
+    emitter.on("signin", () => {
       this.setState({ auth: auth.isAuthenticated });
     });
   }

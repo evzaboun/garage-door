@@ -1,4 +1,5 @@
-import events from "./events";
+import emitter from "./emitter";
+import io from "socket.io-client";
 
 const garageDoorConnection = { instance: null };
 
@@ -7,27 +8,45 @@ garageDoorConnection.connect = function () {
     return;
   }
 
-  this.instance = new WebSocket("ws://192.168.1.250:8081");
+  // this.instance = io("http://localhost:8080", {
+  this.instance = io("http://192.168.1.250:8080", {
+    reconnection: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    reconnectionAttempts: 5,
+  });
 
-  //event listeners
-  this.instance.onopen = () => {
-    console.log("connected websocket");
-    events.emit("connected");
-  };
+  this.instance.on("connect", function () {
+    console.log("connected!");
+    //this.instance.emit("greet", { message: "Hello server!" });
+    emitter.emit("connected");
+  });
 
-  this.instance.onclose = (e) => {
-    console.log(`Socket is closed: ${e.reason}`);
-    events.emit("disconnected");
-  };
+  this.instance.on("respond", function (data) {
+    console.log(data);
+  });
 
-  this.instance.onmessage = (e) => {
-    console.log(`Message from server: ${e.data}`);
-  };
+  this.instance.on("ping", () => {
+    //console.log("ping...");
+  });
 
-  this.instance.onerror = (err) => {
-    console.error("Socket encountered error: ", err.message, "Closing socket");
-    this.instance.close();
-  };
+  this.instance.on("pong", function (latency) {
+    //console.log("pong...... " + latency);
+  });
+
+  this.instance.on("reconnect_failed", () => {
+    emitter.emit("disconnected");
+  });
+
+  this.instance.on("reconnect_error", (error) => {
+    emitter.emit("disconnected");
+  });
+
+  this.instance.on("reconnecting", (attemptNumber) => {
+    emitter.emit("disconnected");
+  });
+
+  //On error
 };
 
 garageDoorConnection.disconnect = function () {
@@ -37,9 +56,10 @@ garageDoorConnection.disconnect = function () {
   this.instance = null;
 };
 
-garageDoorConnection.send = function (message) {
+garageDoorConnection.send = function (event, message) {
   if (this.instance) {
-    this.instance.send(message);
+    console.log(message);
+    this.instance.emit(event, message);
   }
 };
 

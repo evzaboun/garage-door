@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import garageDoor from "../services/garageDoorConnection";
-//import events from "../services/events";
+import emitter from "../services/emitter";
 
 const styles = {
   freezeContainer: {
@@ -41,38 +41,46 @@ class GarageDoor extends Component {
 
   componentDidMount() {
     garageDoor.connect();
-    // events.on("disconnected", () => {
-    //   this.setState({ isDisconnected: true });
-    // });
-    // events.on("connected", () => {
-    //   this.setState({ isDisconnected: false });
-    // });
-    document.body.style.overflow = "hidden";
+    emitter.on("disconnected", () => {
+      this.setState({ isDisconnected: true });
+    });
+    emitter.on("connected", () => {
+      this.setState({ isDisconnected: false });
+    });
+    //document.body.style.overflow = "hidden";
   }
 
   componentWillUnmount() {
     garageDoor.disconnect();
+    emitter.removeAllListeners("disconnected");
+    emitter.removeAllListeners("connected");
   }
 
   openDoor = (e) => {
     this.preventBubbling(e);
+    if (this.state.isDisconnected) {
+      return;
+    }
     navigator.vibrate(15);
-    garageDoor.send("OPEN");
-    console.log("OPEN");
+    garageDoor.send("door", "open");
   };
 
   closeDoor = (e) => {
     this.preventBubbling(e);
+    if (this.state.isDisconnected) {
+      return;
+    }
     navigator.vibrate(15);
-    garageDoor.send("CLOSE");
-    console.log("CLOSE");
+    garageDoor.send("door", "close");
   };
 
   freezeDoor = (e) => {
     this.preventBubbling(e);
+    if (this.state.isDisconnected) {
+      return;
+    }
     navigator.vibrate([20, 50, 20]);
-    garageDoor.send("FREEZE");
-    console.log("FREEZE");
+    garageDoor.send("door", "freeze");
   };
 
   preventBubbling = (e) => {

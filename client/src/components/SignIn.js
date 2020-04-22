@@ -13,7 +13,7 @@ import { Link, useHistory } from "react-router-dom";
 import { useEffect } from "react";
 import auth from "../services/authentication";
 import ExtLink from "@material-ui/core/Link";
-import events from "../services/events";
+import emitter from "../services/emitter";
 
 function Footer() {
   return (
@@ -57,7 +57,7 @@ export default function SignIn() {
     auth.signIn().then((isAuthenticated) => {
       if (isAuthenticated) {
         history.push("/");
-        events.emit("signin");
+        emitter.emit("signin");
       }
     });
   };

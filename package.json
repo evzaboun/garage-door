@@ -4,8 +4,12 @@
   "description": "Garage door opener",
   "main": "client.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "client-install": "npm install --prefix client",
+    "server-install": "npm install",
+    "start": "node server.js",
+    "client": "npm start --prefix client",
+    "server": "nodemon app.js",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
@@ -19,8 +23,10 @@
   },
   "homepage": "https://github.com/evzaboun/garage-door#readme",
   "dependencies": {
+    "concurrently": "^5.1.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "onoff": "^5.0.1",
     "socket.io": "^2.3.0"
   }
 }
