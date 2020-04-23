@@ -5,7 +5,7 @@
 // UIButton: App button, when pushed momentarily it opens/closes/freezes the door
 
 const Gpio = require("onoff").Gpio;
-const eventEmitter = require("./eventEmitter");
+const emitter = require("./emitter");
 
 class DoorController {
   constructor() {
@@ -19,9 +19,9 @@ class DoorController {
     // this.reedSwitchBottom = new Gpio(24, "in", "falling", {
     //   debounceTimeout: 100
     // });
-    eventEmitter.on("open", (event) => this.direction(event));
-    eventEmitter.on("close", (event) => this.direction(event));
-    eventEmitter.on("freeze", (event) => this.direction(event));
+    emitter.on("open", (event) => this.direction(event));
+    emitter.on("close", (event) => this.direction(event));
+    emitter.on("freeze", (event) => this.direction(event));
     this.state = 0;
     this.timer = 0;
 
@@ -30,12 +30,12 @@ class DoorController {
         throw err;
       }
       if (value === 0) {
-        eventEmitter.emit("open", "open");
+        emitter.emit("open", "open");
         console.log(`Open push button pressed`);
       }
 
       if (value === 1) {
-        eventEmitter.emit("freeze", "freeze");
+        emitter.emit("freeze", "freeze");
       }
     });
 
@@ -44,12 +44,12 @@ class DoorController {
         throw err;
       }
       if (value === 0) {
-        eventEmitter.emit("close", "close");
+        emitter.emit("close", "close");
         console.log(`Close push button pressed`);
       }
 
       if (value === 1) {
-        eventEmitter.emit("freeze", "freeze");
+        emitter.emit("freeze", "freeze");
       }
     });
 
@@ -58,7 +58,7 @@ class DoorController {
     //     throw err;
     //   }
     //   if (value === 0) {
-    //     setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
+    //     setTimeout(() => emitter.emit("freeze", "freeze"), 5000);
     //   }
 
     //   console.log(`Top Reed Switch activated! value: ${value}`);
@@ -69,7 +69,7 @@ class DoorController {
     //     throw err;
     //   }
     //   if (value === 0) {
-    //     setTimeout(() => eventEmitter.emit("freeze", "freeze"), 5000);
+    //     setTimeout(() => emitter.emit("freeze", "freeze"), 5000);
     //   }
     //   console.log(`Bottom Reed Switch activated! value: ${value}`);
     // });
@@ -112,7 +112,7 @@ class DoorController {
 
   setTimer() {
     this.timer = setTimeout(() => {
-      eventEmitter.emit("freeze", "freeze");
+      emitter.emit("freeze", "freeze");
     }, 60000);
   }
 

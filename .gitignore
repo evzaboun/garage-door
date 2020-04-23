@@ -163,3 +163,8 @@ sketch
 # End of https://www.gitignore.io/api/node,react,macos,visualstudiocode
 
 .vscode/launch.json
+ssl
+firebase.json
+.firebaserc
+.firebase
+.vscode

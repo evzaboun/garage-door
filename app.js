@@ -1,13 +1,13 @@
 const express = require("express");
 const app = express();
-const emitter = require("./eventEmitter");
+const emitter = require("./services/emitter");
 const http = require("http");
 const https = require("https");
 const dotenv = require("dotenv").config();
 const fs = require("fs");
 const os = require("os");
 const Socket = require("socket.io");
-const DoorController = require("./doorController");
+const DoorController = require("./services/doorController");
 
 const door = new DoorController();
 
