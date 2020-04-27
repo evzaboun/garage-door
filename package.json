@@ -11,6 +11,11 @@
     "server": "nodemon app.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
+  "nodemonConfig": {
+    "ignore": [
+      "db.json"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/evzaboun/garage-door.git"
@@ -23,9 +28,12 @@
   },
   "homepage": "https://github.com/evzaboun/garage-door#readme",
   "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "bcrypt": "^4.0.1",
     "concurrently": "^5.1.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "lowdb": "^1.0.0",
     "onoff": "^5.0.1",
     "socket.io": "^2.3.0"
   }

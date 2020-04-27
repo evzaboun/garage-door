@@ -8,11 +8,19 @@ const fs = require("fs");
 const os = require("os");
 const Socket = require("socket.io");
 const DoorController = require("./services/doorController");
+const database = require("./services/db");
+const user = require("./routes/user");
 
 const door = new DoorController();
 
 const io = new Socket();
 //setInterval(() => console.log(door.state), 1000);
+app.use(express.json());
+
+//Route all the requests to this path
+app.use("/user", user);
+
+database.init();
 
 app.use(express.static("./public"));
 
@@ -38,10 +46,10 @@ const httpsServer = https
     console.log(`Server is listening on : ${ip + ":" + 8433}`);
   });
 
-app.get("/", (req, res) => {
-  console.log("Root is resolved");
-  res.send("Hello from route!");
-});
+// app.get("/", (req, res) => {
+//   console.log("Root is resolved");
+//   res.send("Hello from route!");
+// });
 
 io.on("connection", (socket) => {
   console.log(
