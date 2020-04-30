@@ -2,14 +2,16 @@ const express = require("express");
 const route = express.Router();
 const db = require("../services/db");
 const validate = require("../middleware/validate");
+const register = require("../middleware/register");
+const login = require("../middleware/login");
 
 //Register new user to the DB (TODO: Authentication only)
-route.post("/register", validate, db.register, (req, res) => {
+route.post("/register", validate, register, (req, res) => {
   res.send("User registered successfully!");
 });
 
 //Login user to the DB (TODO: Authentication only)
-route.post("/login", (req, res) => {
+route.post("/login", validate, login, (req, res) => {
   res.send(`User logged in: ${JSON.stringify(req.body.email)}`);
 });
 
