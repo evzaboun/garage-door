@@ -35,8 +35,10 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
     "lowdb": "^1.0.0",
     "onoff": "^5.0.1",
+    "shortid": "^2.2.15",
     "socket.io": "^2.3.0"
   }
 }

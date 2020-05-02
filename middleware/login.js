@@ -3,48 +3,28 @@ const FileAsync = require("lowdb/adapters/FileAsync");
 const adapter = new FileAsync("./db.json");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv").config();
+const _ = require("lodash");
+require("dotenv").config();
 
-module.exports = function (req, res, next) {
-  let user = JSON.parse(JSON.stringify(req.body));
-
+module.exports = (req, res, next) => {
   low(adapter).then((lowdb) => {
-    let userExists = lowdb
-      .get("users")
-      .has(`${base64encode(user.email)}`)
-      .value();
+    const user = lowdb.get("users").find({ email: req.body.email }).value();
 
-    if (!userExists) {
+    if (!user) {
       return res.status(400).send("Invalid username or password!");
     }
 
-    low(adapter).then((lowdb) => {
-      let hash = lowdb
-        .get(`users.${base64encode(user.email)}.password`)
-        .value();
+    let hash = user.password;
 
-      bcrypt.compare(user.password, hash).then((isPasswordValid) => {
-        if (!isPasswordValid) {
-          return res.status(400).send("Invalid username or password!");
-        }
+    bcrypt.compare(req.body.password, hash).then((isPasswordValid) => {
+      if (!isPasswordValid) {
+        return res.status(400).send("Invalid username or password!");
+      }
 
-        const userEntry = lowdb
-          .get(`users.${base64encode(user.email)}`)
-          .value();
+      const payload = _.pick(user, ["id", "isAdmin", "isVerified"]);
 
-        const payload = {
-          email: userEntry.email,
-          isAdmin: userEntry.isAdmin,
-          isVerified: userEntry.isVerified,
-        };
-
-        const token = jwt.sign(payload, process.env.JWT_KEY);
-        res.send(token);
-      });
+      const token = jwt.sign(payload, process.env.JWT_KEY);
+      res.send(token);
     });
   });
-};
-
-const base64encode = (str) => {
-  return Buffer.from(str).toString("base64");
 };

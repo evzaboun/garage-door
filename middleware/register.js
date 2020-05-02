@@ -1,42 +1,41 @@
 const low = require("lowdb");
 const FileAsync = require("lowdb/adapters/FileAsync");
 const adapter = new FileAsync("./db.json");
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
 const { sendActivationEmail } = require("../services/sendEmail");
 const jwt = require("jsonwebtoken");
+const shortid = require("shortid");
+const bcrypt = require("bcrypt");
+const _ = require("lodash");
 require("dotenv").config();
+const saltRounds = 10;
 
-exports.register = function (req, res) {
-  let user = JSON.parse(JSON.stringify(req.body));
-
+exports.register = (req, res) => {
   low(adapter).then((lowdb) => {
-    let userExists = lowdb
-      .get("users")
-      .has(`${base64encode(user.email)}`)
-      .value();
+    const user = lowdb.get("users").find({ email: req.body.email }).value();
 
-    if (userExists) {
+    if (user) {
       return res.status(400).send("User exists!");
     }
 
     let numberOfUsers = lowdb.get("users").size().value();
 
     bcrypt.genSalt(saltRounds).then((salt) => {
-      bcrypt.hash(user.password, salt).then((hash) => {
+      bcrypt.hash(req.body.password, salt).then((hash) => {
         // Store hashed password in DB.
         const newUser = {
-          email: user.email,
+          email: req.body.email,
           password: hash,
           isAdmin: numberOfUsers === 0 ? true : false,
           isVerified: false,
+          id: shortid.generate(),
         };
 
         lowdb
-          .set(`users[${base64encode(user.email)}]`, newUser)
+          .get("users")
+          .push(newUser)
           .write()
           .then(() => {
-            sendActivationEmail(user.email)
+            sendActivationEmail(_.pick(newUser, ["email", "id"]))
               .then((result) => {
                 return res.send(result);
               })
@@ -52,7 +51,7 @@ exports.register = function (req, res) {
   });
 };
 
-exports.activate = function (req, res) {
+exports.activate = (req, res) => {
   const { token } = req.params;
 
   if (!token) {
@@ -68,7 +67,9 @@ exports.activate = function (req, res) {
 
     low(adapter).then((lowdb) => {
       lowdb
-        .set(`users.${base64encode(decodedToken.email)}.isVerified`, true)
+        .get("users")
+        .find({ id: decodedToken.id })
+        .assign({ isVerified: true })
         .write()
         .then(() => {
           return res.send(`Email Activated!`);
@@ -76,11 +77,3 @@ exports.activate = function (req, res) {
     });
   });
 };
-
-const base64encode = (str) => {
-  return Buffer.from(str).toString("base64");
-};
-
-// const base64decode = (base64str) => {
-//   return Buffer.from(base64str, "base64").toString("ascii");
-// };
