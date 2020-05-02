@@ -2,12 +2,16 @@ const express = require("express");
 const route = express.Router();
 const db = require("../services/db");
 const validate = require("../middleware/validate");
-const register = require("../middleware/register");
+const { register, activate } = require("../middleware/register");
 const login = require("../middleware/login");
 
 //Register new user to the DB (TODO: Authentication only)
 route.post("/register", validate, register, (req, res) => {
   res.send("User registered successfully!");
+});
+
+route.get("/activate/:token", activate, (req, res) => {
+  res.send(`User activated!`);
 });
 
 //Login user to the DB (TODO: Authentication only)

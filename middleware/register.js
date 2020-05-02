@@ -3,8 +3,11 @@ const FileAsync = require("lowdb/adapters/FileAsync");
 const adapter = new FileAsync("./db.json");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const { sendActivationEmail } = require("../services/sendEmail");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
-module.exports = function (req, res, next) {
+exports.register = function (req, res) {
   let user = JSON.parse(JSON.stringify(req.body));
 
   low(adapter).then((lowdb) => {
@@ -25,15 +28,51 @@ module.exports = function (req, res, next) {
         const newUser = {
           email: user.email,
           password: hash,
-          admin: numberOfUsers === 0 ? true : false,
-          isEmailVerified: false,
+          isAdmin: numberOfUsers === 0 ? true : false,
+          isVerified: false,
         };
 
         lowdb
           .set(`users[${base64encode(user.email)}]`, newUser)
           .write()
-          .then(next());
+          .then(() => {
+            sendActivationEmail(user.email)
+              .then((result) => {
+                return res.send(result);
+              })
+              .catch((err) => {
+                console.log(err);
+                return res.send(
+                  "Error occured with email sending. Please try again later."
+                );
+              });
+          });
       });
+    });
+  });
+};
+
+exports.activate = function (req, res) {
+  const { token } = req.params;
+
+  if (!token) {
+    return res
+      .status(400)
+      .send("Something went wrong with the activation proccess!");
+  }
+
+  jwt.verify(token, process.env.JWT_KEY, (err, decodedToken) => {
+    if (err) {
+      return res.status(400).send(`Expired link!`);
+    }
+
+    low(adapter).then((lowdb) => {
+      lowdb
+        .set(`users.${base64encode(decodedToken.email)}.isVerified`, true)
+        .write()
+        .then(() => {
+          return res.send(`Email Activated!`);
+        });
     });
   });
 };
@@ -45,7 +84,3 @@ const base64encode = (str) => {
 // const base64decode = (base64str) => {
 //   return Buffer.from(base64str, "base64").toString("ascii");
 // };
-
-//   const generateToken = (id) => {
-//     console.log("Token generated successfully!");
-//   };

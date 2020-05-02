@@ -18,7 +18,7 @@ const io = new Socket();
 app.use(express.json());
 
 //Route all the requests to this path
-app.use("/user", user);
+app.use("/", user);
 
 database.init();
 

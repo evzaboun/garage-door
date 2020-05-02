@@ -28,7 +28,17 @@ module.exports = function (req, res, next) {
           return res.status(400).send("Invalid username or password!");
         }
 
-        const token = jwt.sign({ message: "hello!" }, process.env.JWT_KEY);
+        const userEntry = lowdb
+          .get(`users.${base64encode(user.email)}`)
+          .value();
+
+        const payload = {
+          email: userEntry.email,
+          isAdmin: userEntry.isAdmin,
+          isVerified: userEntry.isVerified,
+        };
+
+        const token = jwt.sign(payload, process.env.JWT_KEY);
         res.send(token);
       });
     });
