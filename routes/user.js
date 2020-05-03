@@ -1,11 +1,11 @@
 const express = require("express");
 const route = express.Router();
-const db = require("../services/db");
-const validate = require("../middleware/validate");
+const { validate, validateForgot } = require("../middleware/validate");
 const { register, activate } = require("../middleware/register");
 const login = require("../middleware/login");
+const { auth } = require("../middleware/auth");
+const { admin } = require("../middleware/admin");
 
-//Register new user to the DB (TODO: Authentication only)
 route.post("/register", validate, register, (req, res) => {
   res.send("User registered successfully!");
 });
@@ -14,25 +14,38 @@ route.get("/activate/:token", activate, (req, res) => {
   res.send(`User activated!`);
 });
 
-//Login user to the DB (TODO: Authentication only)
 route.post("/login", validate, login, (req, res) => {
   res.send(`User logged in: ${JSON.stringify(req.body.email)}`);
 });
 
-//Login user to the DB (TODO: Authentication only)
-route.post("/forgot", (req, res) => {
+//Forgot password
+route.post("/forgot", validateForgot, (req, res) => {
   res.send(
     `Reset your password: Email sent at: ${JSON.stringify(req.body.email)}`
   );
 });
 
-//Get users from the DB
-route.get("/:id", (req, res) => {});
+//User can get his own profile
+route.get("/profile", (req, res) => {});
 
-//Delete user from the DB (TODO: Authentication only)
-route.delete("/:id", (req, res) => {});
+// Ask for elevated permissions (Non admin users)
+route.post("/elevate", (req, res) => {});
 
-//Update existing user of the DB (TODO: Authentication only)
-route.put("/:id", (req, res) => {});
+// Give elevated permissions (Admin only)
+route.post("/assign", auth, admin, (req, res) => {
+  res.send("Passed all the tests!!!!");
+});
+
+// //Get all users from the DB (Admin only)
+// route.get("/:id", (req, res) => {});
+
+// //Delete user from the DB (Admin only)
+// route.delete("/:id", (req, res) => {});
+
+// //Update existing user(Admin only)
+// route.put("/:id", (req, res) => {});
+
+// //Garage controller route (Admin only)
+// route.get("/", auth, admin, (req, res) => {});
 
 module.exports = route;

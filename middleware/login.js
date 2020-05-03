@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
       const payload = _.pick(user, ["id", "isAdmin", "isVerified"]);
 
       const token = jwt.sign(payload, process.env.JWT_KEY);
-      res.send(token);
+      return res.header("x-auth-token", token).send("Login successful");
     });
   });
 };

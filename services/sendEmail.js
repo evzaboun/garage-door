@@ -1,7 +1,7 @@
 const sgMail = require("@sendgrid/mail");
 const { generateActivationToken } = require("../services/generateToken");
 require("dotenv").config();
-sgMail.setApiKey(process.env.SG_KEY2);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 exports.sendActivationEmail = (user) => {
   return new Promise((resolve, reject) => {

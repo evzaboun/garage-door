@@ -1,7 +1,10 @@
-const schema = require("../model/schemas");
+const { registrationAndLoginSchema } = require("../model/schemas");
+const { forgotSchema } = require("../model/schemas");
 
-const validate = (req, res, next) => {
-  const { error } = schema.validate(JSON.parse(JSON.stringify(req.body)));
+exports.validate = (req, res, next) => {
+  const { error } = registrationAndLoginSchema.validate(
+    JSON.parse(JSON.stringify(req.body))
+  );
   const valid = error == null;
   if (valid) {
     next();
@@ -10,4 +13,12 @@ const validate = (req, res, next) => {
   }
 };
 
-module.exports = validate;
+exports.validateForgot = (req, res, next) => {
+  const { error } = forgotSchema.validate(JSON.parse(JSON.stringify(req.body)));
+  const valid = error == null;
+  if (valid) {
+    next();
+  } else {
+    res.status(422).send(error.message);
+  }
+};

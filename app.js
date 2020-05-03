@@ -46,11 +46,6 @@ const httpsServer = https
     console.log(`Server is listening on : ${ip + ":" + 8433}`);
   });
 
-// app.get("/", (req, res) => {
-//   console.log("Root is resolved");
-//   res.send("Hello from route!");
-// });
-
 io.on("connection", (socket) => {
   console.log(
     `Client connected. No # of clients: ${countClients(io.sockets.sockets)}`

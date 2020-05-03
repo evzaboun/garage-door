@@ -9,7 +9,4 @@ db.init = function () {
   });
 };
 
-// //Admin can assign roles to users
-// db.assign = function (user) {};
-
 module.exports = db;
