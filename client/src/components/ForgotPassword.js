@@ -78,7 +78,7 @@ export default function ForgotPassword() {
           </Button>
           <Grid container>
             <Grid item>
-              <Link to="/signin">{"Remember your password?"}</Link>
+              <Link to="/login">{"Remember your password?"}</Link>
             </Grid>
           </Grid>
         </form>

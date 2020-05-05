@@ -27,8 +27,8 @@ import OpacityIcon from "@material-ui/icons/Opacity";
 import GarageDoor from "./GarageDoor";
 import SolarTemperature from "./SolarTemperature";
 import Settings from "./Settings";
-import SignUp from "./SignUp";
-import SignIn from "./SignIn";
+import Register from "./Register";
+import Login from "./Login";
 import ForgotPassword from "./ForgotPassword";
 import auth from "../services/authentication";
 import PrivateRoute from "./PrivateRoute";
@@ -138,21 +138,10 @@ class RootComponent extends Component {
   };
 
   componentDidMount() {
-    emitter.on("signin", () => {
+    emitter.on("login", () => {
       this.setState({ auth: auth.isAuthenticated });
     });
   }
-
-  //TODO MOVE THE  SIGN IN/OUT METHODS TO THE AUTH SERVICE
-  // signIn = () => {
-  //   auth
-  //     .signIn()
-  //     .then(() => {
-  //       console.log(auth.isAuthenticated);
-  //       this.setState({ auth: auth.isAuthenticated });
-  //     })
-  //     .catch();
-  // };
 
   signOut = () => {
     auth
@@ -201,7 +190,7 @@ class RootComponent extends Component {
                 }
               }}
               component={Link}
-              to={auth.isAuthenticated ? "/" : "/signin"}
+              to={auth.isAuthenticated ? "/" : "/login"}
             >
               {auth.isAuthenticated ? "Logout" : "Login"}
             </LoginButton>
@@ -330,8 +319,8 @@ class RootComponent extends Component {
             <PrivateRoute path="/garage" component={GarageDoor} />
             <Route path="/solar" component={SolarTemperature} />
             <Route path="/settings" component={Settings} />
-            <Route path="/signup" component={SignUp} />
-            <Route path="/signin" component={SignIn} />
+            <Route path="/register" component={Register} />
+            <Route path="/login" component={Login} />
             <Route path="/forgot" component={ForgotPassword} />
           </Switch>
         </main>
