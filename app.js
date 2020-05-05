@@ -10,14 +10,15 @@ const Socket = require("socket.io");
 const DoorController = require("./services/doorController");
 const database = require("./services/db");
 const user = require("./routes/user");
-
+const cors = require("cors");
 const door = new DoorController();
+
+app.use(cors());
 
 const io = new Socket();
 //setInterval(() => console.log(door.state), 1000);
 app.use(express.json());
 
-//Route all the requests to this path
 app.use("/", user);
 
 database.init();

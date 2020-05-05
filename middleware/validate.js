@@ -2,9 +2,7 @@ const { registrationAndLoginSchema } = require("../model/schemas");
 const { forgotSchema } = require("../model/schemas");
 
 exports.validate = (req, res, next) => {
-  const { error } = registrationAndLoginSchema.validate(
-    JSON.parse(JSON.stringify(req.body))
-  );
+  const { error } = registrationAndLoginSchema.validate(req.body);
   const valid = error == null;
   if (valid) {
     next();
@@ -14,7 +12,7 @@ exports.validate = (req, res, next) => {
 };
 
 exports.validateForgot = (req, res, next) => {
-  const { error } = forgotSchema.validate(JSON.parse(JSON.stringify(req.body)));
+  const { error } = forgotSchema.validate(req.body);
   const valid = error == null;
   if (valid) {
     next();
