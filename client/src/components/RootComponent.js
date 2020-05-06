@@ -30,7 +30,7 @@ import Settings from "./Settings";
 import Register from "./Register";
 import Login from "./Login";
 import ForgotPassword from "./ForgotPassword";
-import auth from "../services/authentication";
+import auth from "../services/auth";
 import PrivateRoute from "./PrivateRoute";
 import emitter from "../services/emitter";
 
@@ -121,7 +121,7 @@ class RootComponent extends Component {
       title: "Home monitoring",
       selected: 0,
       open: false,
-      auth: auth.isAuthenticated,
+      isLoggedIn: false,
     };
   }
 
@@ -138,19 +138,23 @@ class RootComponent extends Component {
   };
 
   componentDidMount() {
+    if (auth.getToken()) {
+      this.setState({ isLoggedIn: true });
+    }
     emitter.on("login", () => {
-      this.setState({ auth: auth.isAuthenticated });
+      this.setState({ isLoggedIn: true });
     });
   }
 
-  signOut = () => {
-    auth
-      .signOut()
-      .then(() => {
-        console.log(auth.isAuthenticated);
-        this.setState({ auth: auth.isAuthenticated });
-      })
-      .catch();
+  componentWillUnmount() {
+    emitter.removeAllListeners("login");
+  }
+
+  handleLogout = () => {
+    if (auth.getToken()) {
+      auth.logout();
+      this.setState({ isLoggedIn: false });
+    }
   };
 
   render() {
@@ -184,15 +188,11 @@ class RootComponent extends Component {
               color="inherit"
               variant="outlined"
               className={classes.loginButton}
-              onClick={() => {
-                if (auth.isAuthenticated) {
-                  this.signOut();
-                }
-              }}
+              onClick={this.handleLogout}
               component={Link}
-              to={auth.isAuthenticated ? "/" : "/login"}
+              to={auth.getToken() ? "/" : "/login"}
             >
-              {auth.isAuthenticated ? "Logout" : "Login"}
+              {this.state.isLoggedIn ? "Logout" : "Login"}
             </LoginButton>
           </Toolbar>
         </AppBar>

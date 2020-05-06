@@ -11,7 +11,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Link, useHistory } from "react-router-dom";
 import { useEffect, useState } from "react";
-import auth from "../services/authentication";
+import auth from "../services/auth";
 import ExtLink from "@material-ui/core/Link";
 import emitter from "../services/emitter";
 import http from "../services/http";
@@ -68,7 +68,8 @@ export default function Login() {
       .then((response) => {
         console.log(response);
         if (response.status === 200) {
-          auth.isAuthenticated = true;
+          const token = response.headers["x-auth-token"];
+          auth.setToken(token);
           emitter.emit("login");
           history.push("/");
         }
@@ -86,7 +87,7 @@ export default function Login() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Login
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
@@ -125,7 +126,7 @@ export default function Login() {
             to="/"
             onClick={login}
           >
-            Sign In
+            Login
           </Button>
           <Grid container>
             <Grid item xs>

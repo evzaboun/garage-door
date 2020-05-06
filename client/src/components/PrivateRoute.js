@@ -1,5 +1,5 @@
 import React from "react";
-import auth from "../services/authentication";
+import auth from "../services/auth";
 import { Redirect, Route } from "react-router-dom";
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
@@ -7,7 +7,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
     <Route
       {...rest}
       render={(props) =>
-        auth.isLoggedIn() ? (
+        auth.getToken() ? (
           <Component {...props} />
         ) : (
           <Redirect
