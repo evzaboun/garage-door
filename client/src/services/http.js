@@ -1,4 +1,5 @@
 import axios from "axios";
+import auth from "../services/auth";
 
 const http = {};
 
@@ -9,10 +10,20 @@ http.post = (endpoint, message) => {
     data: message,
     headers: {
       "content-type": "application/json;charset=utf-8",
+      "x-auth-token": auth.getToken(),
     },
   });
 };
 
-http.get = () => {};
+http.get = (endpoint) => {
+  return axios({
+    method: "get",
+    url: endpoint,
+    headers: {
+      "content-type": "application/json;charset=utf-8",
+      "x-auth-token": auth.getToken(),
+    },
+  });
+};
 
 export default http;

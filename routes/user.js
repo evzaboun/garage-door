@@ -3,8 +3,8 @@ const route = express.Router();
 const { validate, validateForgot } = require("../middleware/validate");
 const { register, activate } = require("../middleware/register");
 const login = require("../middleware/login");
-const { auth } = require("../middleware/auth");
-const { admin } = require("../middleware/admin");
+const { auth, admin } = require("../middleware/auth");
+const { users } = require("../middleware/users");
 
 route.post("/register", validate, register, (req, res) => {
   res.send("User registered successfully!");
@@ -15,24 +15,23 @@ route.get("/activate/:token", activate, (req, res) => {
 });
 
 route.post("/login", validate, login, (req, res) => {
-  res.send(`User logged in: ${JSON.stringify(req.body.email)}`);
+  res.send(`User logged in: ${req.body.email}`);
 });
 
-//Forgot password
 route.post("/forgot", validateForgot, (req, res) => {
   res.send(
-    `Reset your password: Email sent at: ${JSON.stringify(req.body.email)}`
+    `To reset your password follow the information sent in your email: ${req.body.email}`
   );
 });
 
 //User can get his own profile
 route.get("/profile", (req, res) => {});
 
-// Ask for elevated permissions (Non admin users)
-route.post("/elevate", (req, res) => {});
+route.get("/users", auth, admin, users, (req, res) => {
+  res.send("All users sent...");
+});
 
-// Give elevated permissions (Admin only)
-route.post("/assign", auth, admin, (req, res) => {
+route.put("/assign/:email", auth, admin, (req, res) => {
   res.send("Passed all the tests!!!!");
 });
 
