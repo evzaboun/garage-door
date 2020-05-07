@@ -14,10 +14,15 @@ exports.auth = (req, res, next) => {
 };
 
 exports.admin = (req, res, next) => {
-  if (!req.user.isAdmin || !req.user.isVerified) {
-    return res
-      .status(403)
-      .send("Forbidden. User not an admin, or unverified email!");
+  if (!req.user.isAdmin) {
+    return res.status(403).send("Forbidden. User not an admin!");
+  }
+  next();
+};
+
+exports.verified = (req, res, next) => {
+  if (!req.user.isVerified) {
+    return res.status(403).send("Forbidden. Unverified email!");
   }
   next();
 };

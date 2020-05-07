@@ -26,4 +26,16 @@ http.get = (endpoint) => {
   });
 };
 
+http.put = (endpoint, message) => {
+  return axios({
+    method: "put",
+    url: endpoint,
+    data: message,
+    headers: {
+      "content-type": "application/json;charset=utf-8",
+      "x-auth-token": auth.getToken(),
+    },
+  });
+};
+
 export default http;
