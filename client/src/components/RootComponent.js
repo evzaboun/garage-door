@@ -318,7 +318,7 @@ class RootComponent extends Component {
             <PrivateRoute exact path="/" component={GarageDoor} />
             <PrivateRoute path="/garage" component={GarageDoor} />
             <Route path="/solar" component={SolarTemperature} />
-            <Route path="/settings" component={Settings} />
+            <PrivateRoute path="/settings" component={Settings} />
             <Route path="/register" component={Register} />
             <Route path="/login" component={Login} />
             <Route path="/forgot" component={ForgotPassword} />
