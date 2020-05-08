@@ -1,5 +1,6 @@
 import emitter from "./emitter";
 import io from "socket.io-client";
+import auth from "../services/auth";
 
 const garageDoorConnection = { instance: null };
 
@@ -14,6 +15,7 @@ garageDoorConnection.connect = function () {
     reconnectionDelay: 1000,
     reconnectionDelayMax: 5000,
     reconnectionAttempts: 5,
+    query: { token: auth.getToken() },
   });
 
   this.instance.on("connect", function () {

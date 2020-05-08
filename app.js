@@ -12,6 +12,7 @@ const database = require("./services/db");
 const user = require("./routes/user");
 const cors = require("cors");
 const door = new DoorController();
+const jwt = require("jsonwebtoken");
 
 app.use(cors());
 
@@ -47,7 +48,22 @@ const httpsServer = https
     console.log(`Server is listening on : ${ip + ":" + 8433}`);
   });
 
-io.on("connection", (socket) => {
+io.use((socket, next) => {
+  if (socket.handshake.query.token) {
+    jwt.verify(
+      socket.handshake.query.token,
+      process.env.JWT_KEY,
+      (err, decodedToken) => {
+        if (err) return next(new Error("Authentication error"));
+        if (decodedToken.isAdmin) {
+          next();
+        }
+        console.log("Forbidden. User not an admin!");
+        next(new Error("Forbidden. User not an admin!"));
+      }
+    );
+  }
+}).on("connection", (socket) => {
   console.log(
     `Client connected. No # of clients: ${countClients(io.sockets.sockets)}`
   );
