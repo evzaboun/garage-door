@@ -35,17 +35,17 @@ class GarageDoor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isDisconnected: false,
+      connected: false,
     };
   }
 
   componentDidMount() {
     garageDoor.connect();
     emitter.on("disconnected", () => {
-      this.setState({ isDisconnected: true });
+      this.setState({ connected: false });
     });
     emitter.on("connected", () => {
-      this.setState({ isDisconnected: false });
+      this.setState({ connected: true });
     });
     //document.body.style.overflow = "hidden";
   }
@@ -58,7 +58,7 @@ class GarageDoor extends Component {
 
   openDoor = (e) => {
     this.preventBubbling(e);
-    if (this.state.isDisconnected) {
+    if (!this.state.connected) {
       return;
     }
     navigator.vibrate(15);
@@ -67,7 +67,7 @@ class GarageDoor extends Component {
 
   closeDoor = (e) => {
     this.preventBubbling(e);
-    if (this.state.isDisconnected) {
+    if (!this.state.connected) {
       return;
     }
     navigator.vibrate(15);
@@ -76,7 +76,7 @@ class GarageDoor extends Component {
 
   freezeDoor = (e) => {
     this.preventBubbling(e);
-    if (this.state.isDisconnected) {
+    if (!this.state.connected) {
       return;
     }
     navigator.vibrate([20, 50, 20]);
@@ -100,7 +100,7 @@ class GarageDoor extends Component {
           <Button
             variant="outlined"
             className={classes.button}
-            disabled={this.state.isDisconnected}
+            disabled={!this.state.connected}
             onClick={(e) => this.openDoor(e)}
           >
             OPEN
@@ -108,7 +108,7 @@ class GarageDoor extends Component {
           <Button
             variant="outlined"
             className={classes.button}
-            disabled={this.state.isDisconnected}
+            disabled={!this.state.connected}
             onClick={(e) => this.closeDoor(e)}
           >
             CLOSE

@@ -48,7 +48,9 @@ garageDoorConnection.connect = function () {
     emitter.emit("disconnected");
   });
 
-  //On error
+  this.instance.on("error", function (err) {
+    console.log(err);
+  });
 };
 
 garageDoorConnection.disconnect = function () {

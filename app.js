@@ -55,11 +55,11 @@ io.use((socket, next) => {
       process.env.JWT_KEY,
       (err, decodedToken) => {
         if (err) return next(new Error("Authentication error"));
-        if (decodedToken.isAdmin) {
+        if (!decodedToken.isAdmin) {
+          next(new Error("Forbidden"));
+        } else {
           next();
         }
-        console.log("Forbidden. User not an admin!");
-        next(new Error("Forbidden. User not an admin!"));
       }
     );
   }
