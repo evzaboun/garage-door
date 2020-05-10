@@ -9,16 +9,16 @@ const emitter = require("./emitter");
 
 class DoorController {
   constructor() {
-    this.openButton = new Gpio(3, "in", "both", { debounceTimeout: 100 });
-    this.closeButton = new Gpio(2, "in", "both", { debounceTimeout: 100 });
-    this.relayClose = new Gpio(8, "high");
-    this.relayOpen = new Gpio(7, "high");
     // this.reedSwitchTop = new Gpio(23, "in", "falling", {
     //   debounceTimeout: 100
     // });
     // this.reedSwitchBottom = new Gpio(24, "in", "falling", {
     //   debounceTimeout: 100
     // });
+    this.openButton = new Gpio(3, "in", "both", { debounceTimeout: 100 });
+    this.closeButton = new Gpio(2, "in", "both", { debounceTimeout: 100 });
+    this.relayClose = new Gpio(8, "high");
+    this.relayOpen = new Gpio(7, "high");
     emitter.on("open", (event) => this.direction(event));
     emitter.on("close", (event) => this.direction(event));
     emitter.on("freeze", (event) => this.direction(event));
@@ -95,14 +95,20 @@ class DoorController {
     this.fixRange();
 
     if (this.state === 1) {
-      setTimeout(() => this.relayOpen.writeSync(0), 100);
-      setTimeout(() => this.relayClose.writeSync(1), 100);
+      this.relayOpen
+        .write(0)
+        .then(() => this.relayClose.write(1))
+        .catch((err) => console.log(err));
     } else if (this.state === -1) {
-      setTimeout(() => this.relayOpen.writeSync(1), 100);
-      setTimeout(() => this.relayClose.writeSync(0), 100);
+      this.relayOpen
+        .write(1)
+        .then(() => this.relayClose.write(0))
+        .catch((err) => console.log(err));
     } else {
-      this.relayOpen.writeSync(1);
-      this.relayClose.writeSync(1);
+      this.relayOpen
+        .write(1)
+        .then(() => this.relayClose.write(1))
+        .catch((err) => console.log(err));
     }
   }
 
