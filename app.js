@@ -125,5 +125,5 @@ io.attach(httpsServer, options);
 
 let timer = null;
 const setTimer = () => {
-  timer = setTimeout(() => emitter.emit("freeze"), 1500);
+  timer = setTimeout(() => emitter.emit("freeze", "freeze"), 1000);
 };

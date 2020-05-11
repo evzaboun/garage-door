@@ -16,7 +16,7 @@ garageDoorConnection.connect = function () {
     reconnectionDelayMax: 5000,
     reconnectionAttempts: 5,
     query: { token: auth.getToken() },
-    // transports: ["websocket"],
+    transports: ["websocket"],
   });
 
   this.instance.on("connect", function () {
@@ -37,7 +37,7 @@ garageDoorConnection.connect = function () {
   this.instance.on("pong", function (latency) {
     //console.log("pong...... " + latency);
     clearTimeout(timer);
-    emitter.emit("connected");
+    //emitter.emit("connected");
   });
 
   this.instance.on("reconnect_failed", () => {
