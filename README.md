@@ -49,8 +49,7 @@ Add the following
 
 ```bash
 NODE_ENV=development
-PORT=5000
-IP = "192.168.1.250"
+IP = "YourRaspberryPiIP"
 HOSTNAME = `${os.hostname() + ".local"}`
 JWT_KEY = "SetYourJWTKeyHere"  # Can be any string as your secret
 SENDGRID_API_KEY = "YourSendgridAPIKey" # Used for user email verification
